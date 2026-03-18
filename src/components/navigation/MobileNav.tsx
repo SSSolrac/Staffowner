@@ -5,6 +5,6 @@ export const MobileNav = ({ isOwner }: { isOwner: boolean }) => (
     <Link to="/dashboard">Dashboard</Link>
     <Link to="/profile">Profile</Link>
     <Link to="/settings">Settings</Link>
-    {isOwner && <Link to="/admin/login-history">Logins</Link>}
+    {isOwner && <Link to="/admin/staff">Staff</Link>}
   </nav>
 );

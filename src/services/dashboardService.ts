@@ -1,6 +1,8 @@
 import { customerService } from '@/services/customerService';
 import type { DashboardData } from '@/types/dashboard';
 
+const pesoFormatter = new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' });
+
 export const dashboardService = {
   async getDashboardData(): Promise<DashboardData> {
     const customers = await customerService.getCustomers();
@@ -10,7 +12,7 @@ export const dashboardService = {
       kpis: [
         { label: 'Total customers', value: String(totalCustomers), helpText: 'Updated now' },
         { label: 'Total orders', value: '324', helpText: '+12% this week' },
-        { label: 'Revenue', value: '$21,430', helpText: '+8% this month' },
+        { label: 'Revenue', value: pesoFormatter.format(21430), helpText: '+8% this month' },
         { label: 'Active staff', value: '14', helpText: '2 on break' },
       ],
       tierSummary: [

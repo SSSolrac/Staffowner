@@ -1,17 +1,26 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router';
+import { useAuth } from '@/hooks/useAuth';
 
 const links = [
   { label: 'Dashboard', path: '/dashboard' },
   { label: 'Profile', path: '/profile' },
   { label: 'Settings', path: '/settings' },
-  { label: 'Activity Log', path: '/admin/activity-log' },
-  { label: 'Login History', path: '/admin/login-history' },
+  { label: 'Activity Log', path: '/admin/activity-log', ownerOnly: true },
+  { label: 'Login History', path: '/admin/login-history', ownerOnly: true },
+  { label: 'Staff Management', path: '/admin/staff', ownerOnly: true },
 ];
 
 export const CommandBar = () => {
   const [query, setQuery] = useState('');
-  const filtered = useMemo(() => links.filter((item) => item.label.toLowerCase().includes(query.toLowerCase())), [query]);
+  const { user } = useAuth();
+
+  const filtered = useMemo(
+    () => links
+      .filter((item) => !item.ownerOnly || user?.role === 'owner')
+      .filter((item) => item.label.toLowerCase().includes(query.toLowerCase())),
+    [query, user?.role],
+  );
 
   return (
     <div className="relative">
@@ -23,6 +32,7 @@ export const CommandBar = () => {
               {item.label}
             </Link>
           ))}
+          {filtered.length === 0 && <p className="px-2 py-1 text-xs text-slate-500">No results</p>}
         </div>
       )}
     </div>

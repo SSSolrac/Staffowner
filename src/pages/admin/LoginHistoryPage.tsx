@@ -4,9 +4,33 @@ import { useLoginHistory } from '@/hooks/useLoginHistory';
 export const LoginHistoryPage = () => {
   const { rows, filters, setFilters, totalPages, stats } = useLoginHistory();
 
+  const exportReport = () => {
+    const headers = ['User', 'Role', 'Login Time', 'Logout Time', 'IP Address', 'Device', 'Status'];
+    const csvRows = rows.map((row) => [
+      row.userName,
+      row.role,
+      new Date(row.loginTime).toISOString(),
+      row.logoutTime ? new Date(row.logoutTime).toISOString() : '',
+      row.ipAddress,
+      row.device,
+      row.loginStatus,
+    ]);
+    const csv = [headers, ...csvRows].map((entry) => entry.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `login-history-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold">Login History</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold">Login History</h2>
+        <button className="rounded border px-3 py-2 text-sm" onClick={exportReport}>Export report</button>
+      </div>
       <section className="grid md:grid-cols-4 gap-3">
         <div className="border rounded p-3">Total logins today: {stats.totalToday}</div>
         <div className="border rounded p-3">Failed logins: {stats.failed}</div>

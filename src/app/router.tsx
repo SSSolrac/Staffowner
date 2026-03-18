@@ -6,6 +6,7 @@ import { ProfilePage } from '@/pages/ProfilePage';
 import { SettingsPage } from '@/pages/SettingsPage';
 import { ActivityLogPage } from '@/pages/admin/ActivityLogPage';
 import { LoginHistoryPage } from '@/pages/admin/LoginHistoryPage';
+import { StaffManagementPage } from '@/pages/admin/StaffManagementPage';
 import { useAuth } from '@/hooks/useAuth';
 
 const ProtectedRoute = ({ ownerOnly = false, children }: { ownerOnly?: boolean; children: React.ReactNode }) => {
@@ -27,6 +28,7 @@ export const router = createBrowserRouter([
       { path: 'settings', element: <SettingsPage /> },
       { path: 'admin/activity-log', element: <ProtectedRoute ownerOnly><ActivityLogPage /></ProtectedRoute> },
       { path: 'admin/login-history', element: <ProtectedRoute ownerOnly><LoginHistoryPage /></ProtectedRoute> },
+      { path: 'admin/staff', element: <ProtectedRoute ownerOnly><StaffManagementPage /></ProtectedRoute> },
     ],
   },
   { path: '*', element: <Navigate to="/" replace /> },

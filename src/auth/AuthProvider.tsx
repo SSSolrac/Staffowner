@@ -7,6 +7,7 @@ interface AuthContextType {
   user: SessionUser | null;
   login: (email: string, password: string, role: UserRole) => Promise<void>;
   logout: () => Promise<void>;
+  updateUser: (payload: Partial<Pick<SessionUser, 'name' | 'avatar'>>) => void;
 }
 
 const SESSION_KEY = 'staffowner_session';
@@ -31,6 +32,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.removeItem(SESSION_KEY);
   };
 
-  const value = useMemo(() => ({ user, login, logout }), [user]);
+  const updateUser = (payload: Partial<Pick<SessionUser, 'name' | 'avatar'>>) => {
+    setUser((previous) => {
+      if (!previous) return null;
+      const next = { ...previous, ...payload };
+      localStorage.setItem(SESSION_KEY, JSON.stringify(next));
+      return next;
+    });
+  };
+
+  const value = useMemo(() => ({ user, login, logout, updateUser }), [user]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
