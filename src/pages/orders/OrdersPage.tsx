@@ -30,6 +30,13 @@ const statusTone = (status: OrderStatus) => {
   return 'neutral';
 };
 
+const statusTone = (status: OrderStatus) => {
+  if (status === 'completed' || status === 'delivered') return 'success';
+  if (status === 'cancelled' || status === 'refunded') return 'danger';
+  if (status === 'pending') return 'warning';
+  return 'neutral';
+};
+
 const isTerminalStatus = (status: OrderStatus) => status === 'completed' || status === 'cancelled' || status === 'refunded' || status === 'delivered';
 
 export const OrdersPage = () => {
@@ -67,11 +74,6 @@ export const OrdersPage = () => {
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2 text-sm">
           {statusSummary.map((item) => <div key={item.status} className="border rounded p-2 capitalize">{item.status}: <strong>{item.total}</strong></div>)}
         </div>
-
-        <div className="rounded border p-3 text-sm bg-slate-50 dark:bg-slate-900/40">
-          <p className="font-medium">Action priorities</p>
-          <p>Confirm pending payments first, then close out ready orders to keep kitchen flow moving.</p>
-        </div>
       </section>
 
       <section className="rounded-lg border bg-white dark:bg-slate-800 p-4 overflow-auto">
@@ -88,13 +90,8 @@ export const OrdersPage = () => {
                   <td>{formatCurrency(order.total)}</td>
                   <td>
                     <div className="flex items-center gap-2">
-                      <StatusChip label={order.status.replace(/-/g, ' ')} tone={statusTone(order.status)} />
-                      <select
-                        className="border rounded px-2 py-1 disabled:opacity-60"
-                        value={order.status}
-                        disabled={isTerminalStatus(order.status)}
-                        onChange={async (e) => { await updateStatus(order.id, e.target.value as OrderStatus); toast.success('Order status updated.'); }}
-                      >
+                      <StatusChip label={order.status.replaceAll('-', ' ')} tone={statusTone(order.status)} />
+                      <select className="border rounded px-2 py-1" value={order.status} onChange={async (e) => { await updateStatus(order.id, e.target.value as OrderStatus); toast.success('Order status updated.'); }}>
                         {statuses.filter((value) => value !== 'all').map((value) => <option key={value} value={value}>{value}</option>)}
                       </select>
                     </div>
@@ -103,18 +100,7 @@ export const OrdersPage = () => {
                   <td>{loyaltyLabel[getLoyaltyState(order)]}</td>
                   <td className="space-x-2">
                     <button className="border rounded px-2 py-1" onClick={() => { setSelectedOrder(order); setNoteDraft(order.notes ?? ''); }}>Details</button>
-                    <button
-                      className="border rounded px-2 py-1 disabled:opacity-50"
-                      disabled={paid}
-                      onClick={async () => {
-                        if (paid) {
-                          toast.info('Payment is already confirmed for this order.');
-                          return;
-                        }
-                        const updated = await confirmPayment(order.id);
-                        toast.success(updated.loyaltyStampPreparedAt ? 'Payment confirmed and loyalty credit queued.' : 'Payment confirmed.');
-                      }}
-                    >
+                    <button className="border rounded px-2 py-1 disabled:opacity-50" disabled={paid} onClick={async () => { const updated = await confirmPayment(order.id); toast.success(updated.loyaltyStampPreparedAt ? 'Payment confirmed and loyalty prepared.' : 'Payment confirmed.'); }}>
                       {paid ? 'Payment Confirmed' : 'Confirm Payment'}
                     </button>
                   </td>
@@ -163,7 +149,7 @@ export const OrdersPage = () => {
               <div className="space-y-2 text-sm">
                 {selectedOrder.statusHistory.map((event, index) => (
                   <div key={`${event.at}-${event.status}-${index}`} className="border-l-2 pl-3">
-                    <p className="capitalize font-medium">{event.status.replace(/-/g, ' ')}</p>
+                    <p className="capitalize font-medium">{event.status.replaceAll('-', ' ')}</p>
                     <p className="text-slate-500">{new Date(event.at).toLocaleString()}</p>
                     {event.note && <p className="text-slate-500">{event.note}</p>}
                   </div>
@@ -174,12 +160,12 @@ export const OrdersPage = () => {
             <div>
               <p className="font-medium text-sm mb-1">Internal order notes</p>
               <textarea className="border rounded w-full px-2 py-1 text-sm" rows={4} value={noteDraft} onChange={(e) => setNoteDraft(e.target.value)} />
-                <p className="text-xs text-slate-500 mt-1">Notes are visible to authorized staff and retained in this operational workspace.</p>
-              </div>
+              <p className="text-xs text-slate-500 mt-1">Notes are visible to authorized staff and saved in this mock environment.</p>
+            </div>
 
             <div className="flex gap-2">
               <button className="border rounded px-3 py-1" onClick={async () => { const updated = await updateNotes(selectedOrder.id, noteDraft); setSelectedOrder(updated); toast.success('Order notes updated.'); }}>Save Notes</button>
-              <button className="border rounded px-3 py-1 disabled:opacity-50" disabled={selectedOrder.paymentStatus === 'paid'} onClick={async () => { const updated = await confirmPayment(selectedOrder.id); setSelectedOrder(updated); toast.success(updated.loyaltyStampPreparedAt ? 'Payment confirmed and loyalty credit queued.' : 'Payment confirmed.'); }}>
+              <button className="border rounded px-3 py-1 disabled:opacity-50" disabled={selectedOrder.paymentStatus === 'paid'} onClick={async () => { const updated = await confirmPayment(selectedOrder.id); setSelectedOrder(updated); toast.success('Payment confirmed.'); }}>
                 {selectedOrder.paymentStatus === 'paid' ? 'Payment Confirmed' : 'Confirm Payment'}
               </button>
             </div>
