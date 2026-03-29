@@ -35,7 +35,7 @@ export const ImportsReportsPage = () => {
             </tbody>
           </table>
         </div>
-        <p className="text-xs text-slate-500">History reflects recent import runs in this workspace and will sync automatically once live import jobs are enabled.</p>
+        <p className="text-xs text-slate-500">History is currently mocked and will be wired to import jobs API when available.</p>
       </section>
     </div>
   );

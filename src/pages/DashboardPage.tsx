@@ -29,7 +29,7 @@ export const DashboardPage = () => {
   const statusCards = useMemo(() => data?.orders.statusSummary ?? [], [data]);
   const ops = useMemo(() => {
     if (!data) return null;
-    const unconfirmed = data.orders.statusSummary.find((s) => s.status === 'pending')?.total ?? 0;
+    const unconfirmed = data.orders.recentOrders.filter((row) => row.status === 'pending').length;
     const cancelled = data.orders.statusSummary.find((s) => s.status === 'cancelled')?.total ?? 0;
     const refunded = data.orders.statusSummary.find((s) => s.status === 'refunded')?.total ?? 0;
     return {
@@ -41,17 +41,6 @@ export const DashboardPage = () => {
       alertGroups: alertPriority(data.overview.alerts),
     };
   }, [data]);
-
-  const urgentChecklist = useMemo(() => {
-    if (!ops) return [];
-    const checklist: Array<{ label: string; value: string; tone: 'danger' | 'warning' | 'info' }> = [];
-    if (ops.unconfirmed > 0) checklist.push({ label: 'Payments waiting confirmation', value: String(ops.unconfirmed), tone: 'danger' });
-    if (ops.cancelled + ops.refunded > 0) checklist.push({ label: 'Cancelled / refunded orders to review', value: String(ops.cancelled + ops.refunded), tone: 'warning' });
-    if (!ops.menuPublished) checklist.push({ label: 'Daily menu not published', value: 'Action needed', tone: 'warning' });
-    if (ops.lowStock > 0) checklist.push({ label: 'Low-stock alerts', value: String(ops.lowStock), tone: 'danger' });
-    if (checklist.length === 0) checklist.push({ label: 'Operational queue', value: 'All clear', tone: 'info' });
-    return checklist;
-  }, [ops]);
 
   if (loading) return <p>Loading dashboard...</p>;
   if (error || !data || !ops) return <p className="text-red-600">{error || 'Error'}</p>;
@@ -89,27 +78,6 @@ export const DashboardPage = () => {
                 <SalesTrendChart data={data.overview.salesTrend} />
               </div>
               <AlertsPanel alerts={data.overview.alerts} />
-            </section>
-
-            <section className="rounded-lg border bg-white dark:bg-slate-800 p-4 space-y-3">
-              <h3 className="font-medium">Needs Attention Now</h3>
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-2">
-                {urgentChecklist.map((item) => (
-                  <article
-                    key={item.label}
-                    className={`border rounded p-3 ${
-                      item.tone === 'danger'
-                        ? 'border-rose-300 bg-rose-50 text-rose-800'
-                        : item.tone === 'warning'
-                          ? 'border-amber-300 bg-amber-50 text-amber-800'
-                          : 'border-sky-200 bg-sky-50 text-sky-800'
-                    }`}
-                  >
-                    <p className="text-xs uppercase tracking-wide">{item.label}</p>
-                    <p className="font-semibold">{item.value}</p>
-                  </article>
-                ))}
-              </div>
             </section>
           </div>
         )}
