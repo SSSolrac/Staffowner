@@ -1,11 +1,13 @@
 import type { ReactNode } from 'react';
 
-export type DashboardTabKey = 'overview' | 'orders' | 'menu';
+export type DashboardTabKey = 'overview' | 'orders' | 'menu' | 'customers' | 'imports';
 
 const tabs: Array<{ key: DashboardTabKey; label: string }> = [
   { key: 'overview', label: 'Overview' },
   { key: 'orders', label: 'Orders' },
   { key: 'menu', label: 'Menu' },
+  { key: 'customers', label: 'Customers' },
+  { key: 'imports', label: 'Imports' },
 ];
 
 export const DashboardTabs = ({
