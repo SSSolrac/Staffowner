@@ -16,17 +16,30 @@ export type OrderStatus =
 export type OrderItem = {
   name: string;
   qty: number;
+  unitPrice: number;
+};
+
+export type OrderStatusHistoryItem = {
+  status: OrderStatus;
+  at: string;
+  note?: string;
 };
 
 export type Order = {
   id: string;
   customerId?: string;
   customerName: string;
+  customerEmail?: string;
+  customerPhone?: string;
   items: OrderItem[];
   total: number;
+  serviceFee?: number;
+  discount?: number;
   status: OrderStatus;
+  statusHistory: OrderStatusHistoryItem[];
   paymentStatus: PaymentStatus;
   paymentMethod: PaymentMethod;
+  paymentProofUrl?: string;
   createdAt: string;
   notes?: string;
   loyaltyStampPreparedAt?: string;

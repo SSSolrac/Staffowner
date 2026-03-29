@@ -1,3 +1,4 @@
+import { formatCurrency } from '@/utils/currency';
 import type { RecentOrder } from '@/types/dashboard';
 
 export const RecentOrdersTable = ({ title, rows }: { title: string; rows: RecentOrder[] }) => (
@@ -19,7 +20,7 @@ export const RecentOrdersTable = ({ title, rows }: { title: string; rows: Recent
             <td>{row.id}</td>
             <td>{row.customerName}</td>
             <td className="capitalize">{row.status}</td>
-            <td>${row.total.toFixed(2)}</td>
+            <td>{formatCurrency(row.total)}</td>
             <td>{new Date(row.createdAt).toLocaleString()}</td>
           </tr>
         ))}
