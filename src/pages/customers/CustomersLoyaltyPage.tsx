@@ -80,11 +80,6 @@ export const CustomersLoyaltyPage = () => {
               <p>Top order category: Beverages</p>
             </div>
             <div className="border rounded p-3 text-sm">
-              <p className="font-medium">Rewards history</p>
-              <p>• Free drink voucher redeemed last month</p>
-              <p>• 10% dine-in reward used this quarter</p>
-            </div>
-            <div className="border rounded p-3 text-sm">
               <p className="font-medium">Manual loyalty adjustment</p>
               <p className="text-slate-500">Manual point updates will be enabled after backend permission and audit logging integration is completed.</p>
               <button className="border rounded px-2 py-1 mt-2" onClick={() => toast.info('Loyalty adjustment is view-only in this build.')}>Request adjustment</button>

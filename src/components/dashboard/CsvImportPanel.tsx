@@ -21,7 +21,7 @@ export const CsvImportPanel = () => {
   const [validRows, setValidRows] = useState<Record<string, string>[]>([]);
   const [invalidRows, setInvalidRows] = useState<Array<{ rowNumber: number; reason: string }>>([]);
   const [loading, setLoading] = useState(false);
-  const [duplicateMode, setDuplicateMode] = useState<'skip' | 'update'>('skip');
+  const [duplicateMode, setDuplicateMode] = useState<'skip' | 'update' | 'replace'>('skip');
 
   const headers = useMemo(() => (rows[0] ? Object.keys(rows[0]) : []), [rows]);
 
@@ -52,7 +52,7 @@ export const CsvImportPanel = () => {
 
       <div className="grid sm:grid-cols-3 gap-3">
         <label className="text-sm">Import Type<select className="block border rounded mt-1 px-2 py-1 w-full" value={type} onChange={(e) => setType(e.target.value as CsvImportType)}>{options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
-        <label className="text-sm">Duplicate handling<select className="block border rounded mt-1 px-2 py-1 w-full" value={duplicateMode} onChange={(e) => setDuplicateMode(e.target.value as 'skip' | 'update')}><option value="skip">Skip duplicates</option><option value="update">Update matching rows</option></select></label>
+        <label className="text-sm">Duplicate handling<select className="block border rounded mt-1 px-2 py-1 w-full" value={duplicateMode} onChange={(e) => setDuplicateMode(e.target.value as 'skip' | 'update' | 'replace')}><option value="skip">Skip duplicates</option><option value="update">Update matching rows</option><option value="replace">Replace all matching rows</option></select></label>
         <label className="text-sm">CSV File
           <input className="block border rounded mt-1 px-2 py-1 w-full" type="file" accept=".csv,text/csv" onChange={async (event) => {
             const file = event.target.files?.[0];

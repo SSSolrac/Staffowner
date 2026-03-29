@@ -65,11 +65,6 @@ export const OrdersPage = () => {
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2 text-sm">
           {statusSummary.map((item) => <div key={item.status} className="border rounded p-2 capitalize">{item.status}: <strong>{item.total}</strong></div>)}
         </div>
-
-        <div className="rounded border p-3 text-sm bg-slate-50 dark:bg-slate-900/40">
-          <p className="font-medium">Action priorities</p>
-          <p>Confirm pending payments first, then close out ready orders to keep kitchen flow moving.</p>
-        </div>
       </section>
 
       <section className="rounded-lg border bg-white dark:bg-slate-800 p-4 overflow-auto">
@@ -156,8 +151,8 @@ export const OrdersPage = () => {
             <div>
               <p className="font-medium text-sm mb-1">Internal order notes</p>
               <textarea className="border rounded w-full px-2 py-1 text-sm" rows={4} value={noteDraft} onChange={(e) => setNoteDraft(e.target.value)} />
-                <p className="text-xs text-slate-500 mt-1">Notes are visible to authorized staff and retained in this operational workspace.</p>
-              </div>
+              <p className="text-xs text-slate-500 mt-1">Notes are visible to authorized staff and saved in this mock environment.</p>
+            </div>
 
             <div className="flex gap-2">
               <button className="border rounded px-3 py-1" onClick={async () => { const updated = await updateNotes(selectedOrder.id, noteDraft); setSelectedOrder(updated); toast.success('Order notes updated.'); }}>Save Notes</button>

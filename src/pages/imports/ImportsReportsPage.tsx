@@ -35,7 +35,7 @@ export const ImportsReportsPage = () => {
             </tbody>
           </table>
         </div>
-        <p className="text-xs text-slate-500">History is shown from the current training dataset and will be connected to live import jobs once integration is enabled.</p>
+        <p className="text-xs text-slate-500">History is currently mocked and will be wired to import jobs API when available.</p>
       </section>
     </div>
   );

@@ -79,12 +79,6 @@ export const DailyMenuPage = () => {
           <p><strong>Summary:</strong> {working.categories.length} categories · {working.categories.reduce((sum, c) => sum + c.items.length, 0)} items · {working.isActive ? 'Currently live' : 'Not yet published'}</p>
         </div>
 
-        <div className="rounded border p-3 text-sm">
-          <p className="font-medium">Currently active menu</p>
-          <p>{working.isActive ? `${working.title || 'Menu of the Day'} is published for service.` : 'No active daily menu is published yet.'}</p>
-          {working.date && <p className="text-slate-500">Service date: {working.date}</p>}
-        </div>
-
         <div className="space-y-4">
           <div className="flex items-center justify-between"><h3 className="font-medium">Categories</h3><button className="border rounded px-2 py-1" onClick={() => setDraft({ ...working, categories: [...working.categories, { id: `cat-${makeId()}`, name: '', items: [{ id: `item-${makeId()}`, name: '' }] }] })}>Add category</button></div>
           {working.categories.length === 0 && <p className="text-sm text-slate-500 border rounded p-3">No categories added yet. Start by adding your first service category (e.g., Pasta, Beverages).</p>}
