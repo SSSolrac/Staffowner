@@ -30,6 +30,15 @@ const statusTone = (status: OrderStatus) => {
   return 'neutral';
 };
 
+const statusTone = (status: OrderStatus) => {
+  if (status === 'completed' || status === 'delivered') return 'success';
+  if (status === 'cancelled' || status === 'refunded') return 'danger';
+  if (status === 'pending') return 'warning';
+  return 'neutral';
+};
+
+const isTerminalStatus = (status: OrderStatus) => status === 'completed' || status === 'cancelled' || status === 'refunded' || status === 'delivered';
+
 export const OrdersPage = () => {
   const { orders, loading, error, query, status, range, setQuery, setStatus, setRange, confirmPayment, updateStatus, updateNotes } = useOrders();
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);

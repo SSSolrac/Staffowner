@@ -24,6 +24,7 @@ export const CsvImportPanel = () => {
   const [duplicateMode, setDuplicateMode] = useState<'skip' | 'update' | 'replace'>('skip');
 
   const headers = useMemo(() => (rows[0] ? Object.keys(rows[0]) : []), [rows]);
+  const validRate = rows.length ? Math.round((validRows.length / rows.length) * 100) : 0;
 
   return (
     <section className="rounded-lg border bg-white dark:bg-slate-800 p-4 space-y-4">
