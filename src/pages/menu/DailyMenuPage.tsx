@@ -63,9 +63,9 @@ export const DailyMenuPage = () => {
         <div className="flex items-start justify-between gap-3">
           <div>
             <h2 className="text-lg font-semibold">Daily Menu Management</h2>
-            <p className="text-sm text-slate-600 dark:text-slate-300">Prepare, validate, and publish the menu used by today&apos;s operations.</p>
+            <p className="text-sm text-[#6B7280] dark:text-slate-300">Prepare, validate, and publish the menu used by today&apos;s operations.</p>
           </div>
-          <span className={`text-xs px-2 py-1 rounded ${working.isActive ? 'bg-green-100 text-green-700' : 'bg-slate-200 text-slate-700'}`}>{working.isActive ? 'Published' : 'Draft'}</span>
+          <span className={`text-xs px-2 py-1 rounded ${working.isActive ? 'bg-green-100 text-green-700' : 'bg-[#FFE4E8] text-slate-700'}`}>{working.isActive ? 'Published' : 'Draft'}</span>
         </div>
 
         <div className="grid sm:grid-cols-2 gap-3">
@@ -81,7 +81,7 @@ export const DailyMenuPage = () => {
 
         <div className="space-y-4">
           <div className="flex items-center justify-between"><h3 className="font-medium">Categories</h3><button className="border rounded px-2 py-1" onClick={() => setDraft({ ...working, categories: [...working.categories, { id: `cat-${makeId()}`, name: '', items: [{ id: `item-${makeId()}`, name: '' }] }] })}>Add category</button></div>
-          {working.categories.length === 0 && <p className="text-sm text-slate-500 border rounded p-3">No categories added yet. Start by adding your first service category (e.g., Pasta, Beverages).</p>}
+          {working.categories.length === 0 && <p className="text-sm text-[#6B7280] border rounded p-3">No categories added yet. Start by adding your first service category (e.g., Pasta, Beverages).</p>}
           {working.categories.map((category, index) => (
             <div key={category.id} className="border rounded p-3 space-y-3">
               <div className="flex items-center gap-2">
@@ -117,12 +117,12 @@ export const DailyMenuPage = () => {
         <h3 className="font-semibold">Owner Preview</h3>
         <div className="border rounded p-3 space-y-1">
           <p className="font-medium">{preview.title || 'Untitled menu'}</p>
-          {preview.subtitle && <p className="text-sm text-slate-600 dark:text-slate-300">{preview.subtitle}</p>}
+          {preview.subtitle && <p className="text-sm text-[#6B7280] dark:text-slate-300">{preview.subtitle}</p>}
           {preview.date && <p className="text-xs">Date: {preview.date}</p>}
           <p className="text-xs">{preview.isActive ? 'Live for customers' : 'Not currently visible to customers'}</p>
         </div>
 
-        {preview.categories.length === 0 ? <p className="text-sm text-slate-500 border rounded p-3">Your menu preview will appear here once categories and items are added.</p> : (
+        {preview.categories.length === 0 ? <p className="text-sm text-[#6B7280] border rounded p-3">Your menu preview will appear here once categories and items are added.</p> : (
           <div className="space-y-3">
             {preview.categories.map((category) => (
               <div key={category.id} className="border rounded p-3">

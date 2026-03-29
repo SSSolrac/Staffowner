@@ -29,7 +29,7 @@ export const CsvImportPanel = () => {
     <section className="rounded-lg border bg-white dark:bg-slate-800 p-4 space-y-4">
       <div>
         <h3 className="font-medium">CSV Imports</h3>
-        <p className="text-sm text-slate-500">Upload, validate, and review data before final backend import.</p>
+        <p className="text-sm text-[#6B7280]">Upload, validate, and review data before final backend import.</p>
       </div>
 
       <div className="rounded border p-3 text-sm space-y-2">
@@ -75,7 +75,7 @@ export const CsvImportPanel = () => {
 
       <div className="grid sm:grid-cols-3 gap-3 text-sm"><div className="border rounded p-3">Rows parsed: <strong>{rows.length}</strong></div><div className="border rounded p-3">Rows valid: <strong>{validRows.length}</strong></div><div className="border rounded p-3">Rows invalid: <strong>{invalidRows.length}</strong></div></div>
 
-      <p className="text-sm text-slate-500">Validation summary: {invalidRows.length === 0 ? 'All parsed rows passed validation checks.' : `${invalidRows.length} rows need correction before import.`}</p>
+      <p className="text-sm text-[#6B7280]">Validation summary: {invalidRows.length === 0 ? 'All parsed rows passed validation checks.' : `${invalidRows.length} rows need correction before import.`}</p>
 
       {headers.length > 0 && (
         <div className="overflow-auto border rounded">

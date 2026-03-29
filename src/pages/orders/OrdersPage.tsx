@@ -46,7 +46,7 @@ export const OrdersPage = () => {
         <div className="flex flex-wrap items-end gap-3 justify-between">
           <div>
             <h2 className="text-lg font-semibold">Orders Operations</h2>
-            <p className="text-sm text-slate-500">Track order progress, confirm payments, and keep a clean service log.</p>
+            <p className="text-sm text-[#6B7280]">Track order progress, confirm payments, and keep a clean service log.</p>
           </div>
           <DateRangeFilter value={range} onChange={setRange} />
         </div>
@@ -131,7 +131,7 @@ export const OrdersPage = () => {
             {selectedOrder.paymentMethod === 'e-wallet' && (
               <div className="border rounded p-3">
                 <p className="font-medium text-sm mb-2">Payment proof preview</p>
-                {selectedOrder.paymentProofUrl ? <img src={selectedOrder.paymentProofUrl} alt="Payment proof" className="h-36 rounded border object-cover" /> : <p className="text-sm text-slate-500">No proof attached yet.</p>}
+                {selectedOrder.paymentProofUrl ? <img src={selectedOrder.paymentProofUrl} alt="Payment proof" className="h-36 rounded border object-cover" /> : <p className="text-sm text-[#6B7280]">No proof attached yet.</p>}
               </div>
             )}
 
@@ -141,8 +141,8 @@ export const OrdersPage = () => {
                 {selectedOrder.statusHistory.map((event, index) => (
                   <div key={`${event.at}-${event.status}-${index}`} className="border-l-2 pl-3">
                     <p className="capitalize font-medium">{event.status.replaceAll('-', ' ')}</p>
-                    <p className="text-slate-500">{new Date(event.at).toLocaleString()}</p>
-                    {event.note && <p className="text-slate-500">{event.note}</p>}
+                    <p className="text-[#6B7280]">{new Date(event.at).toLocaleString()}</p>
+                    {event.note && <p className="text-[#6B7280]">{event.note}</p>}
                   </div>
                 ))}
               </div>
@@ -151,7 +151,7 @@ export const OrdersPage = () => {
             <div>
               <p className="font-medium text-sm mb-1">Internal order notes</p>
               <textarea className="border rounded w-full px-2 py-1 text-sm" rows={4} value={noteDraft} onChange={(e) => setNoteDraft(e.target.value)} />
-              <p className="text-xs text-slate-500 mt-1">Notes are visible to authorized staff and saved in this mock environment.</p>
+              <p className="text-xs text-[#6B7280] mt-1">Notes are visible to authorized staff and saved in this mock environment.</p>
             </div>
 
             <div className="flex gap-2">

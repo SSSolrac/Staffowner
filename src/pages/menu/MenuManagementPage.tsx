@@ -27,7 +27,7 @@ export const MenuManagementPage = () => {
     <div className="space-y-4">
       <section className="rounded-lg border bg-white dark:bg-slate-800 p-4 space-y-3">
         <h2 className="text-lg font-semibold">Regular Menu Management</h2>
-        <p className="text-sm text-slate-500">Manage permanent menu items, pricing, and availability.</p>
+        <p className="text-sm text-[#6B7280]">Manage permanent menu items, pricing, and availability.</p>
 
         <div className="grid md:grid-cols-2 gap-3">
           <label className="text-sm">Item Name<input className="block border rounded mt-1 px-2 py-1 w-full" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} /></label>
@@ -62,7 +62,7 @@ export const MenuManagementPage = () => {
           </div>
         </div>
 
-        {filtered.length === 0 ? <div className="border rounded p-4 text-sm text-slate-500">No menu items match the current filters.</div> : (
+        {filtered.length === 0 ? <div className="border rounded p-4 text-sm text-[#6B7280]">No menu items match the current filters.</div> : (
           <div className="space-y-2">
             {filtered.map((item) => (
               <div key={item.id} className="border rounded p-3 flex flex-wrap items-center justify-between gap-3 text-sm">
@@ -70,7 +70,7 @@ export const MenuManagementPage = () => {
                   <Image src={item.imageUrl} alt={item.name} className="h-14 w-14 rounded object-cover" />
                   <div>
                     <p className="font-medium">{item.name} · {formatCurrency(item.price)}</p>
-                    <p className="text-slate-500">{item.category}</p>
+                    <p className="text-[#6B7280]">{item.category}</p>
                     <div className="flex gap-2 mt-1">
                       <StatusChip label={item.isAvailable ? 'Available' : 'Unavailable'} tone={item.isAvailable ? 'success' : 'warning'} />
                       <StatusChip label={item.isFeatured ? 'Featured' : 'Regular'} tone={item.isFeatured ? 'neutral' : 'warning'} />

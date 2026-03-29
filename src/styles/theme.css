@@ -2,94 +2,93 @@
 
 :root {
   --font-size: 16px;
-  
-  /* Happy Tails Pet Café Brand Colors */
-  --color-primary-brand: #C7798E;
-  --color-secondary-brand: #2E6960;
-  --color-accent-brand: #FF4F8B;
+
+  --color-primary-brand: #FFB6C1;
+  --color-secondary-brand: #FFE4E8;
+  --color-accent-brand: #FF8FA3;
   --color-success: #22C55E;
   --color-warning: #F59E0B;
   --color-danger: #EF4444;
-  --color-bg: #F8FAFC;
+  --color-bg: #FFF7F9;
   --color-surface: #FFFFFF;
   --color-text-primary: #1F2937;
   --color-text-secondary: #6B7280;
-  --color-border-default: #E5E7EB;
-  
-  --background: #F8FAFC;
+  --color-border-default: #F3D6DB;
+
+  --background: #FFF7F9;
   --foreground: #1F2937;
   --card: #FFFFFF;
   --card-foreground: #1F2937;
   --popover: #FFFFFF;
   --popover-foreground: #1F2937;
-  --primary: #C7798E;
-  --primary-foreground: #FFFFFF;
-  --secondary: #2E6960;
-  --secondary-foreground: #FFFFFF;
-  --muted: #F3F4F6;
+  --primary: #FFB6C1;
+  --primary-foreground: #1F2937;
+  --secondary: #FFE4E8;
+  --secondary-foreground: #1F2937;
+  --muted: #FFE4E8;
   --muted-foreground: #6B7280;
-  --accent: #FF4F8B;
-  --accent-foreground: #FFFFFF;
+  --accent: #FF8FA3;
+  --accent-foreground: #1F2937;
   --destructive: #EF4444;
   --destructive-foreground: #FFFFFF;
-  --border: #E5E7EB;
+  --border: #F3D6DB;
   --input: transparent;
   --input-background: #FFFFFF;
-  --switch-background: #D1D5DB;
+  --switch-background: #F3D6DB;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --ring: #C7798E;
-  --chart-1: #C7798E;
-  --chart-2: #2E6960;
-  --chart-3: #FF4F8B;
+  --ring: #FFB6C1;
+  --chart-1: #FFB6C1;
+  --chart-2: #FF8FA3;
+  --chart-3: #FFE4E8;
   --chart-4: #22C55E;
   --chart-5: #F59E0B;
-  --radius: 0.75rem;
+  --radius: 0.875rem;
   --sidebar: #FFFFFF;
   --sidebar-foreground: #1F2937;
-  --sidebar-primary: #C7798E;
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #F8FAFC;
+  --sidebar-primary: #FFB6C1;
+  --sidebar-primary-foreground: #1F2937;
+  --sidebar-accent: #FFE4E8;
   --sidebar-accent-foreground: #1F2937;
-  --sidebar-border: #E5E7EB;
-  --sidebar-ring: #C7798E;
+  --sidebar-border: #F3D6DB;
+  --sidebar-ring: #FFB6C1;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
+  --background: #FFF7F9;
+  --foreground: #1F2937;
+  --card: #FFFFFF;
+  --card-foreground: #1F2937;
+  --popover: #FFFFFF;
+  --popover-foreground: #1F2937;
+  --primary: #FFB6C1;
+  --primary-foreground: #1F2937;
+  --secondary: #FFE4E8;
+  --secondary-foreground: #1F2937;
+  --muted: #FFE4E8;
+  --muted-foreground: #6B7280;
+  --accent: #FF8FA3;
+  --accent-foreground: #1F2937;
+  --destructive: #EF4444;
+  --destructive-foreground: #FFFFFF;
+  --border: #F3D6DB;
+  --input: #FFFFFF;
+  --ring: #FFB6C1;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.269 0 0);
-  --sidebar-ring: oklch(0.439 0 0);
+  --chart-1: #FFB6C1;
+  --chart-2: #FF8FA3;
+  --chart-3: #FFE4E8;
+  --chart-4: #22C55E;
+  --chart-5: #F59E0B;
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #1F2937;
+  --sidebar-primary: #FFB6C1;
+  --sidebar-primary-foreground: #1F2937;
+  --sidebar-accent: #FFE4E8;
+  --sidebar-accent-foreground: #1F2937;
+  --sidebar-border: #F3D6DB;
+  --sidebar-ring: #FFB6C1;
 }
 
 @theme inline {
@@ -142,10 +141,20 @@
     @apply bg-background text-foreground;
   }
 
-  /**
-  * Default typography styles for HTML elements (h1-h4, p, label, button, input).
-  * These are in @layer base, so Tailwind utility classes (like text-sm, text-lg) automatically override them.
-  */
+  main section,
+  main article,
+  main aside {
+    border: 1px solid #F3D6DB;
+    background: #FFFFFF;
+    border-radius: 14px;
+    box-shadow: 0 2px 10px rgba(31, 41, 55, 0.05);
+  }
+
+  input,
+  select,
+  textarea {
+    border-color: #F3D6DB;
+  }
 
   html {
     font-size: var(--font-size);

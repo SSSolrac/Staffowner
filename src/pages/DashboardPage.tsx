@@ -50,7 +50,7 @@ export const DashboardPage = () => {
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold">Cafe Owner Dashboard</h1>
-          <p className="text-sm text-slate-500">Operational overview for daily cafe performance.</p>
+          <p className="text-sm text-[#6B7280]">Operational overview for daily cafe performance.</p>
         </div>
         <DateRangeFilter value={selectedRange} onChange={setSelectedRange} />
       </header>
@@ -139,8 +139,8 @@ export const DashboardPage = () => {
             </section>
             <section className="rounded-lg border bg-white dark:bg-slate-800 p-4 space-y-3">
               <h3 className="font-medium">Reporting Snapshot</h3>
-              <p className="text-sm text-slate-500">Current gross sales in view: {formatCurrency(data.overview.salesTrend.reduce((sum, row) => sum + row.sales, 0))}.</p>
-              <p className="text-sm text-slate-500">Use Imports & Reports for CSV uploads, validation, and import history.</p>
+              <p className="text-sm text-[#6B7280]">Current gross sales in view: {formatCurrency(data.overview.salesTrend.reduce((sum, row) => sum + row.sales, 0))}.</p>
+              <p className="text-sm text-[#6B7280]">Use Imports & Reports for CSV uploads, validation, and import history.</p>
             </section>
             <Link className="inline-block border rounded px-3 py-1.5 text-sm" to="/imports">Go to imports & reports</Link>
           </div>
