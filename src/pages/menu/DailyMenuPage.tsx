@@ -79,12 +79,6 @@ export const DailyMenuPage = () => {
           <p><strong>Summary:</strong> {working.categories.length} categories · {working.categories.reduce((sum, c) => sum + c.items.length, 0)} items · {working.isActive ? 'Currently live' : 'Not yet published'}</p>
         </div>
 
-        <div className="rounded border p-3 text-sm">
-          <p className="font-medium">Currently active menu</p>
-          <p>{working.isActive ? `${working.title || 'Menu of the Day'} is published for service.` : 'No active daily menu is published yet.'}</p>
-          {working.date && <p className="text-slate-500">Service date: {working.date}</p>}
-        </div>
-
         <div className="space-y-4">
           <div className="flex items-center justify-between"><h3 className="font-medium">Categories</h3><button className="border rounded px-2 py-1" onClick={() => setDraft({ ...working, categories: [...working.categories, { id: `cat-${makeId()}`, name: '', items: [{ id: `item-${makeId()}`, name: '' }] }] })}>Add category</button></div>
           {working.categories.length === 0 && <p className="text-sm text-slate-500 border rounded p-3">No categories added yet. Start by adding your first service category (e.g., Pasta, Beverages).</p>}
@@ -131,12 +125,9 @@ export const DailyMenuPage = () => {
         {preview.categories.length === 0 ? <p className="text-sm text-slate-500 border rounded p-3">Your menu preview will appear here once categories and items are added.</p> : (
           <div className="space-y-3">
             {preview.categories.map((category) => (
-              <div key={category.id} className="border rounded p-3 bg-slate-50 dark:bg-slate-900/30">
-                <div className="flex items-center justify-between gap-2 mb-2">
-                  <p className="font-medium">{category.name || 'Unnamed category'}</p>
-                  <span className="text-[11px] uppercase tracking-wide text-emerald-700 bg-emerald-100 px-2 py-1 rounded">Available today</span>
-                </div>
-                <ul className="text-sm space-y-1">{category.items.map((item) => <li key={item.id} className="flex items-center justify-between"><span>{item.name || 'Unnamed item'}</span><span className="text-xs text-slate-500">Prepared on order</span></li>)}</ul>
+              <div key={category.id} className="border rounded p-3">
+                <p className="font-medium">{category.name || 'Unnamed category'}</p>
+                <ul className="list-disc pl-5 text-sm">{category.items.map((item) => <li key={item.id}>{item.name || 'Unnamed item'}</li>)}</ul>
               </div>
             ))}
           </div>

@@ -18,16 +18,13 @@ export const AlertsPanel = ({ alerts }: { alerts: DashboardAlert[] }) => (
             <p className="text-xs uppercase tracking-wide text-slate-500">
               {tone === 'danger' ? 'Immediate Action' : tone === 'warning' ? 'Monitor Closely' : 'Informational'}
             </p>
-            {grouped.map((alert, index) => (
-              <article key={alert.id} className={`border rounded p-3 ${toneClasses[alert.tone]} ${tone === 'danger' && index === 0 ? 'ring-2 ring-rose-500 shadow-sm' : ''}`}>
+            {grouped.map((alert) => (
+              <article key={alert.id} className={`border rounded p-3 ${toneClasses[alert.tone]}`}>
                 <div className="flex items-center justify-between gap-2">
                   <p className="font-medium text-sm">{alert.title}</p>
                   <span className="text-[11px] uppercase tracking-wide font-semibold">{tone === 'danger' ? 'Action needed' : tone}</span>
                 </div>
                 <p className="text-sm">{alert.message}</p>
-                {tone === 'danger' && index === 0 && (
-                  <p className="mt-2 text-xs font-semibold uppercase tracking-wide">Highest priority for this shift</p>
-                )}
               </article>
             ))}
           </div>

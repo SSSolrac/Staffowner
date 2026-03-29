@@ -74,25 +74,15 @@ export const CustomersLoyaltyPage = () => {
             <div className="grid sm:grid-cols-2 gap-2 text-sm">
               <p>Email: {selected.email}</p><p>Tier: {selected.tier}</p><p>Points: {selected.points}</p><p>Rewards redeemed: {Math.max(1, Math.floor(selected.points / 220))}</p>
             </div>
-            <div className="grid sm:grid-cols-3 gap-2 text-sm">
-              <div className="border rounded p-2"><p className="text-xs text-slate-500">Est. visits / month</p><p className="font-semibold">{Math.max(2, Math.round(selected.points / 180))}</p></div>
-              <div className="border rounded p-2"><p className="text-xs text-slate-500">Avg spend tier</p><p className="font-semibold">{selected.tier === 'Gold' ? 'High' : selected.tier === 'Silver' ? 'Medium' : 'Emerging'}</p></div>
-              <div className="border rounded p-2"><p className="text-xs text-slate-500">Engagement health</p><p className="font-semibold">{selected.points > 700 ? 'Strong' : 'Watchlist'}</p></div>
-            </div>
             <div className="border rounded p-3 text-sm">
               <p className="font-medium">Recent activity</p>
               <p>Last order: {new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toLocaleDateString()}</p>
               <p>Top order category: Beverages</p>
             </div>
             <div className="border rounded p-3 text-sm">
-              <p className="font-medium">Rewards history</p>
-              <p>• Free drink voucher redeemed last month</p>
-              <p>• 10% dine-in reward used this quarter</p>
-            </div>
-            <div className="border rounded p-3 text-sm">
               <p className="font-medium">Manual loyalty adjustment</p>
-              <p className="text-slate-500">Manual point updates are routed through an approval workflow for manager review.</p>
-              <button className="border rounded px-2 py-1 mt-2" onClick={() => toast.info('Adjustment request recorded and sent for manager review.')}>Request adjustment</button>
+              <p className="text-slate-500">Manual point updates will be enabled after backend permission and audit logging integration is completed.</p>
+              <button className="border rounded px-2 py-1 mt-2" onClick={() => toast.info('Loyalty adjustment is view-only in this build.')}>Request adjustment</button>
             </div>
           </div>
         </div>
