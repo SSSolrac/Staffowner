@@ -32,7 +32,7 @@ export const CustomersLoyaltyPage = () => {
     <div className="space-y-4">
       <section className="rounded-lg border bg-white dark:bg-slate-800 p-4 space-y-3">
         <h2 className="text-lg font-semibold">Customers & Loyalty</h2>
-        <p className="text-sm text-slate-500">Review customer segments, loyalty health, and member engagement.</p>
+        <p className="text-sm text-[#6B7280]">Review customer segments, loyalty health, and member engagement.</p>
         <div className="flex flex-wrap gap-2">
           <input className="border rounded px-2 py-1 w-full md:w-80" placeholder="Search customer name or email" value={query} onChange={(e) => setQuery(e.target.value)} />
           <select className="border rounded px-2 py-1" value={tier} onChange={(e) => setTier(e.target.value as CustomerTier | 'All')}>
@@ -55,7 +55,7 @@ export const CustomersLoyaltyPage = () => {
               ))}
             </tbody>
           </table>
-          {filtered.length === 0 && <p className="text-sm text-slate-500 mt-3">No customers matched your filters.</p>}
+          {filtered.length === 0 && <p className="text-sm text-[#6B7280] mt-3">No customers matched your filters.</p>}
         </div>
         <aside className="rounded-lg border bg-white dark:bg-slate-800 p-4 space-y-3">
           <h3 className="font-medium">Customer activity snapshot</h3>
@@ -81,7 +81,7 @@ export const CustomersLoyaltyPage = () => {
             </div>
             <div className="border rounded p-3 text-sm">
               <p className="font-medium">Manual loyalty adjustment</p>
-              <p className="text-slate-500">Manual point updates will be enabled after backend permission and audit logging integration is completed.</p>
+              <p className="text-[#6B7280]">Manual point updates will be enabled after backend permission and audit logging integration is completed.</p>
               <button className="border rounded px-2 py-1 mt-2" onClick={() => toast.info('Loyalty adjustment is view-only in this build.')}>Request adjustment</button>
             </div>
           </div>

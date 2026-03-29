@@ -16,7 +16,7 @@ export const ImportsReportsPage = () => {
       <section className="rounded-lg border bg-white dark:bg-slate-800 p-4 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold">Imports & Reports</h2>
-          <p className="text-sm text-slate-500">Upload CSV files safely, review validation results, and track import jobs.</p>
+          <p className="text-sm text-[#6B7280]">Upload CSV files safely, review validation results, and track import jobs.</p>
         </div>
         <DateRangeFilter value={range} onChange={setRange} />
       </section>
@@ -35,7 +35,7 @@ export const ImportsReportsPage = () => {
             </tbody>
           </table>
         </div>
-        <p className="text-xs text-slate-500">History is currently mocked and will be wired to import jobs API when available.</p>
+        <p className="text-xs text-[#6B7280]">History is currently mocked and will be wired to import jobs API when available.</p>
       </section>
     </div>
   );

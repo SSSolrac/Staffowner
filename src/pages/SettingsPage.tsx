@@ -23,7 +23,7 @@ export const SettingsPage = () => {
     <div className="space-y-4 max-w-4xl">
       <section className="rounded-lg border bg-white dark:bg-slate-800 p-4 space-y-3">
         <h2 className="text-xl font-semibold">Business Settings</h2>
-        <p className="text-sm text-slate-500">Configure cafe operations and owner-level controls.</p>
+        <p className="text-sm text-[#6B7280]">Configure cafe operations and owner-level controls.</p>
 
         <label className="block text-sm">Cafe Name<input className="block border rounded mt-1 px-2 py-1 w-full" value={cafeName} onChange={(e) => setCafeName(e.target.value)} /></label>
         <div className="grid md:grid-cols-2 gap-3">
@@ -51,7 +51,7 @@ export const SettingsPage = () => {
         <label className="text-sm block max-w-xs">Delivery radius (km)<input type="number" min={0} className="block border rounded mt-1 px-2 py-1 w-full" value={deliveryRadius} onChange={(e) => setDeliveryRadius(Number(e.target.value))} disabled={!delivery} /></label>
       </section>
 
-      <button className="rounded bg-indigo-600 text-white px-3 py-2" onClick={() => toast.success('Business settings saved for this session.')}>Save business settings</button>
+      <button className="rounded bg-[#FFB6C1] text-[#1F2937] px-3 py-2" onClick={() => toast.success('Business settings saved for this session.')}>Save business settings</button>
     </div>
   );
 };

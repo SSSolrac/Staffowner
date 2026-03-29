@@ -7,7 +7,7 @@ export const DateRangeFilter = ({ value, onChange }: { value: DateRangePreset; o
     {options.map((option) => (
       <button
         key={option}
-        className={`px-3 py-1.5 rounded text-sm ${value === option ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900' : 'bg-slate-100 dark:bg-slate-700'}`}
+        className={`px-3 py-1.5 rounded text-sm ${value === option ? 'bg-[#FFB6C1] text-[#1F2937] dark:bg-white dark:text-slate-900' : 'bg-[#FFE4E8] dark:bg-slate-700'}`}
         onClick={() => onChange(option)}
       >
         {option}

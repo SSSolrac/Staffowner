@@ -2,7 +2,7 @@ import type { CustomerTier } from '@/types/customer';
 
 const colorMap: Record<CustomerTier, string> = {
   Gold: 'bg-yellow-100 text-yellow-800',
-  Silver: 'bg-slate-200 text-slate-700',
+  Silver: 'bg-[#FFE4E8] text-slate-700',
   Bronze: 'bg-orange-100 text-orange-800',
   Unranked: 'bg-zinc-100 text-zinc-600',
 };

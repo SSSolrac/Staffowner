@@ -24,7 +24,7 @@ export const DashboardTabs = ({
       {tabs.map((tab) => (
         <button
           key={tab.key}
-          className={`px-3 py-1.5 rounded text-sm whitespace-nowrap ${value === tab.key ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-700'}`}
+          className={`px-3 py-1.5 rounded text-sm whitespace-nowrap ${value === tab.key ? 'bg-[#FFB6C1] text-[#1F2937]' : 'bg-[#FFE4E8] dark:bg-slate-700'}`}
           onClick={() => onChange(tab.key)}
         >
           {tab.label}

@@ -16,11 +16,11 @@ export const ProfilePage = () => {
       <h2 className="text-xl font-semibold mb-4">Profile</h2>
       <div className="flex items-center gap-4 mb-4">
         <Image alt={user?.name} src={user?.avatar} className="h-16 w-16 rounded-full" />
-        <div><p>{user?.name}</p><p className="text-sm text-slate-500">{user?.email}</p></div>
+        <div><p>{user?.name}</p><p className="text-sm text-[#6B7280]">{user?.email}</p></div>
       </div>
       <form onSubmit={updatePassword} className="space-y-2">
         <input required type="password" placeholder="New password" className="border rounded px-2 py-1 w-full" />
-        <button className="rounded bg-indigo-600 text-white px-3 py-2">Change password</button>
+        <button className="rounded bg-[#FFB6C1] text-[#1F2937] px-3 py-2">Change password</button>
       </form>
     </div>
   );
