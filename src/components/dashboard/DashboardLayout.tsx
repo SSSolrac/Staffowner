@@ -33,9 +33,8 @@ export const DashboardLayout = () => {
                 <Sun className="h-4 w-4 inline dark:hidden" />
                 <Moon className="h-4 w-4 hidden dark:inline" />
               </button>
-              <button className="relative" onClick={() => toast.info('Operational alerts are available in Dashboard Overview')}>
+              <button onClick={() => toast.info('Open Dashboard > Overview for current operational alerts.')} aria-label="open-alerts">
                 <Bell className="h-4 w-4" />
-                <span className="absolute -top-1 -right-2 text-[10px] bg-indigo-600 text-white rounded-full px-1">3</span>
               </button>
               <button onClick={async () => { await logout(); toast.success('Logged out'); }}>
                 <LogOut className="h-4 w-4" />

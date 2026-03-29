@@ -1,4 +1,5 @@
 import { customerService } from '@/services/customerService';
+import { formatCurrency } from '@/utils/currency';
 import type {
   DashboardData,
   DateRangePreset,
@@ -20,6 +21,8 @@ const rangeScale: Record<DateRangePreset, number> = {
   ALL: 14.7,
 };
 
+const currency = (value: number) => formatCurrency(value);
+
 const periodLabels: Record<DateRangePreset, string[]> = {
   '1M': ['W1', 'W2', 'W3', 'W4'],
   '3M': ['Jan', 'Feb', 'Mar'],
@@ -27,8 +30,6 @@ const periodLabels: Record<DateRangePreset, string[]> = {
   '1Y': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
   ALL: ['2023', '2024', '2025', '2026'],
 };
-
-const currency = (value: number) => `$${value.toLocaleString()}`;
 
 const buildTrend = (range: DateRangePreset): TrendPoint[] => {
   const labels = periodLabels[range];
@@ -83,6 +84,7 @@ export const dashboardService = {
     const totalSales = trend.reduce((sum, point) => sum + point.sales, 0);
     const totalOrders = statusSummary.reduce((sum, point) => sum + point.total, 0);
     const pending = statusSummary.find((item) => item.status === 'pending')?.total ?? 0;
+    const refunded = statusSummary.find((item) => item.status === 'refunded')?.total ?? 0;
 
     const overviewKpis: KPIItem[] = [
       { label: 'Total Sales', value: currency(totalSales), helpText: `Range: ${range}` },
@@ -108,6 +110,7 @@ export const dashboardService = {
         alerts: [
           { id: 'a1', tone: 'warning', title: 'Low stock', message: 'Truffle Fries has fewer than 10 portions left.' },
           { id: 'a2', tone: 'danger', title: 'Pending confirmations', message: `${pending} orders are still pending payment confirmation.` },
+          { id: 'a4', tone: 'warning', title: 'Refund checks', message: `${refunded} refunded orders need owner review before day close.` },
           { id: 'a3', tone: 'info', title: 'Menu status', message: 'No daily menu is published for tomorrow yet.' },
         ],
         recentOrders,
