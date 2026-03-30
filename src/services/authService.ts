@@ -1,28 +1,31 @@
 import { loginHistoryService } from '@/services/loginHistoryService';
 import type { SessionUser, UserRole } from '@/types/user';
 
-const users: Record<string, SessionUser> = {
-  'owner@happytails.com': { id: 'u1', name: 'Olivia Owner', email: 'owner@happytails.com', role: 'owner', token: 'owner-token' },
-  'staff@happytails.com': { id: 'u2', name: 'Sean Staff', email: 'staff@happytails.com', role: 'staff', token: 'staff-token' },
-};
+const buildSessionUser = (email: string, role: UserRole): SessionUser => ({
+  id: `session-${Date.now()}`,
+  name: email.split('@')[0] || 'Staff User',
+  email,
+  role,
+  token: `session-${Math.random().toString(36).slice(2)}`,
+});
 
 export const authService = {
   async login(email: string, password: string, role: UserRole, device: string): Promise<SessionUser> {
-    const found = users[email];
-    const status = found && found.role === role && password.length > 0 ? 'success' : 'failed';
+    if (!email || !password) throw new Error('Email and password are required.');
+
+    const session = buildSessionUser(email, role);
 
     await loginHistoryService.recordLogin({
-      userId: found?.id ?? 'unknown',
-      userName: found?.name ?? email,
+      userId: session.id,
+      userName: session.name,
       role,
       loginTime: new Date().toISOString(),
-      logoutTime: '',
-      ipAddress: '127.0.0.1',
+      logoutTime: null,
+      ipAddress: null,
       device,
-      loginStatus: status,
+      loginStatus: 'success',
     });
 
-    if (status === 'failed' || !found) throw new Error('Invalid credentials for selected role.');
-    return found;
+    return session;
   },
 };

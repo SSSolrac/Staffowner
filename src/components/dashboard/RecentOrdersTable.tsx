@@ -1,7 +1,7 @@
 import { formatCurrency } from '@/utils/currency';
-import type { RecentOrder } from '@/types/dashboard';
+import type { Order } from '@/types/order';
 
-export const RecentOrdersTable = ({ title, rows }: { title: string; rows: RecentOrder[] }) => (
+export const RecentOrdersTable = ({ title, rows }: { title: string; rows: Order[] }) => (
   <section className="rounded-lg border bg-white dark:bg-slate-800 p-4 space-y-3 overflow-auto">
     <h3 className="font-medium">{title}</h3>
     <table className="w-full text-sm min-w-[640px]">
@@ -17,9 +17,9 @@ export const RecentOrdersTable = ({ title, rows }: { title: string; rows: Recent
       <tbody>
         {rows.map((row) => (
           <tr key={row.id} className="border-t">
-            <td>{row.id}</td>
+            <td>{row.orderNumber}</td>
             <td>{row.customerName}</td>
-            <td className="capitalize">{row.status}</td>
+            <td className="capitalize">{row.status.replaceAll('_', ' ')}</td>
             <td>{formatCurrency(row.total)}</td>
             <td>{new Date(row.createdAt).toLocaleString()}</td>
           </tr>

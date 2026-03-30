@@ -5,8 +5,17 @@ import { useMenuItems } from '@/hooks/useMenuItems';
 import type { MenuItem } from '@/types/menuItem';
 import { formatCurrency } from '@/utils/currency';
 
-const defaultDraft: MenuItem = { id: '', name: '', category: 'Pasta', price: 0, isAvailable: true, isFeatured: false, imageUrl: '' };
-const categories = ['All', 'Pasta', 'Sandwiches', 'Snacks', 'Rice Meals', 'Beverages'];
+const defaultDraft: MenuItem = {
+  id: '',
+  name: '',
+  categoryId: '',
+  description: '',
+  price: 0,
+  isAvailable: true,
+  imageUrl: '',
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+};
 
 export const MenuManagementPage = () => {
   const { items, loading, error, saveItem, deleteItem } = useMenuItems();
@@ -14,9 +23,11 @@ export const MenuManagementPage = () => {
   const [query, setQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('All');
 
+  const categories = useMemo(() => ['All', ...Array.from(new Set(items.map((item) => item.categoryId || 'uncategorized')))], [items]);
+
   const filtered = useMemo(() => items.filter((item) => {
     const byQuery = item.name.toLowerCase().includes(query.toLowerCase());
-    const byCategory = categoryFilter === 'All' || item.category === categoryFilter;
+    const byCategory = categoryFilter === 'All' || (item.categoryId || 'uncategorized') === categoryFilter;
     return byQuery && byCategory;
   }), [items, query, categoryFilter]);
 
@@ -31,21 +42,19 @@ export const MenuManagementPage = () => {
 
         <div className="grid md:grid-cols-2 gap-3">
           <label className="text-sm">Item Name<input className="block border rounded mt-1 px-2 py-1 w-full" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} /></label>
-          <label className="text-sm">Category<select className="block border rounded mt-1 px-2 py-1 w-full" value={draft.category} onChange={(e) => setDraft({ ...draft, category: e.target.value })}>{categories.filter((c) => c !== 'All').map((category) => <option key={category} value={category}>{category}</option>)}</select></label>
+          <label className="text-sm">Category ID<input className="block border rounded mt-1 px-2 py-1 w-full" value={draft.categoryId ?? ''} onChange={(e) => setDraft({ ...draft, categoryId: e.target.value })} /></label>
           <label className="text-sm">Price<input type="number" min={0} step="0.01" className="block border rounded mt-1 px-2 py-1 w-full" value={draft.price} onChange={(e) => setDraft({ ...draft, price: Number(e.target.value) })} /></label>
           <label className="text-sm">Image URL<input className="block border rounded mt-1 px-2 py-1 w-full" value={draft.imageUrl ?? ''} onChange={(e) => setDraft({ ...draft, imageUrl: e.target.value })} /></label>
+          <label className="text-sm md:col-span-2">Description<input className="block border rounded mt-1 px-2 py-1 w-full" value={draft.description ?? ''} onChange={(e) => setDraft({ ...draft, description: e.target.value })} /></label>
         </div>
 
-        <div className="flex flex-wrap gap-3 text-sm"><label><input type="checkbox" checked={draft.isAvailable} onChange={(e) => setDraft({ ...draft, isAvailable: e.target.checked })} /> Available</label><label><input type="checkbox" checked={draft.isFeatured} onChange={(e) => setDraft({ ...draft, isFeatured: e.target.checked })} /> Featured</label></div>
+        <div className="flex flex-wrap gap-3 text-sm"><label><input type="checkbox" checked={draft.isAvailable} onChange={(e) => setDraft({ ...draft, isAvailable: e.target.checked })} /> Available</label></div>
 
         <div className="flex gap-2">
           <button className="border rounded px-3 py-1" onClick={async () => {
             if (!draft.name.trim()) return toast.error('Item name is required.');
             if (draft.price <= 0) return toast.error('Price must be greater than 0.');
-            const duplicate = items.some((item) => item.id !== draft.id && item.name.trim().toLowerCase() === draft.name.trim().toLowerCase() && item.category === draft.category);
-            if (duplicate) return toast.error('A menu item with the same name already exists in this category.');
-            const id = draft.id || `m-${Math.random().toString(36).slice(2, 8)}`;
-            await saveItem({ ...draft, id });
+            await saveItem({ ...draft, updatedAt: new Date().toISOString(), createdAt: draft.createdAt || new Date().toISOString() });
             setDraft(defaultDraft);
             toast.success('Menu item saved.');
           }}>{draft.id ? 'Update Item' : 'Add Item'}</button>
@@ -67,13 +76,12 @@ export const MenuManagementPage = () => {
             {filtered.map((item) => (
               <div key={item.id} className="border rounded p-3 flex flex-wrap items-center justify-between gap-3 text-sm">
                 <div className="flex items-center gap-3">
-                  <Image src={item.imageUrl} alt={item.name} className="h-14 w-14 rounded object-cover" />
+                  <Image src={item.imageUrl ?? undefined} alt={item.name} className="h-14 w-14 rounded object-cover" />
                   <div>
                     <p className="font-medium">{item.name} · {formatCurrency(item.price)}</p>
-                    <p className="text-[#6B7280]">{item.category}</p>
+                    <p className="text-[#6B7280]">Category: {item.categoryId || 'uncategorized'}</p>
                     <div className="flex gap-2 mt-1">
                       <StatusChip label={item.isAvailable ? 'Available' : 'Unavailable'} tone={item.isAvailable ? 'success' : 'warning'} />
-                      <StatusChip label={item.isFeatured ? 'Featured' : 'Regular'} tone={item.isFeatured ? 'neutral' : 'warning'} />
                     </div>
                   </div>
                 </div>

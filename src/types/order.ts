@@ -1,48 +1,68 @@
 import type { DateRangePreset } from './dashboard';
 
-export type PaymentStatus = 'pending' | 'paid';
-export type PaymentMethod = 'cash' | 'card' | 'e-wallet';
+export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded';
+export type PaymentMethod = 'cash' | 'card' | 'e_wallet';
+
+export type OrderType = 'dine_in' | 'pickup' | 'takeout' | 'delivery';
 
 export type OrderStatus =
   | 'pending'
   | 'preparing'
   | 'ready'
+  | 'out_for_delivery'
   | 'completed'
+  | 'delivered'
   | 'cancelled'
-  | 'refunded'
-  | 'out-for-delivery'
-  | 'delivered';
+  | 'refunded';
 
 export type OrderItem = {
-  name: string;
+  id: string;
+  orderId: string;
+  menuItemId?: string | null;
+  itemName: string;
   qty: number;
   unitPrice: number;
+  lineTotal: number;
 };
 
-export type OrderStatusHistoryItem = {
+export type OrderStatusHistory = {
+  id: string;
+  orderId: string;
   status: OrderStatus;
-  at: string;
-  note?: string;
+  note?: string | null;
+  changedByUserId?: string | null;
+  changedAt: string;
 };
+
+export type OrderLoyaltyStatus = 'not-eligible' | 'eligible' | 'stamp-awarded' | 'already-stamped';
 
 export type Order = {
   id: string;
-  customerId?: string;
+  orderNumber: string;
+  customerId?: string | null;
   customerName: string;
-  customerEmail?: string;
-  customerPhone?: string;
+  customerEmail?: string | null;
+  customerPhone?: string | null;
+  customerAddress?: string | null;
+  orderType: OrderType;
   items: OrderItem[];
+  subtotal: number;
+  serviceFee: number;
+  discount: number;
   total: number;
-  serviceFee?: number;
-  discount?: number;
   status: OrderStatus;
-  statusHistory: OrderStatusHistoryItem[];
+  statusTimeline?: OrderStatusHistory[];
   paymentStatus: PaymentStatus;
   paymentMethod: PaymentMethod;
-  paymentProofUrl?: string;
+  receiptImageUrl?: string | null;
   createdAt: string;
-  notes?: string;
-  loyaltyStampPreparedAt?: string;
+  updatedAt: string;
+  notes?: string | null;
+  loyaltyStampStatus?: OrderLoyaltyStatus;
+  loyaltyStampedAt?: string;
+  loyaltyStampedBy?: 'automatic-order-confirmation' | 'manual-staff-adjustment';
+  loyaltyMessage?: string;
+  loyaltyUnlockedRewards?: string[];
 };
 
 export type OrderFilters = {
