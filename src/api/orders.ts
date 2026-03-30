@@ -23,7 +23,7 @@ type CanonicalOrderResponse = Partial<Order> & {
 
 const allowedStatuses: OrderStatus[] = ['pending', 'preparing', 'ready', 'out_for_delivery', 'completed', 'delivered', 'cancelled', 'refunded'];
 const allowedOrderTypes: OrderType[] = ['dine_in', 'pickup', 'takeout', 'delivery'];
-const allowedPaymentMethods: PaymentMethod[] = ['cash', 'e_wallet'];
+const allowedPaymentMethods: PaymentMethod[] = ['cash', 'card', 'e_wallet'];
 const allowedPaymentStatuses: PaymentStatus[] = ['pending', 'paid', 'failed', 'refunded'];
 
 const normalizeStatus = (status: string | undefined): OrderStatus => {

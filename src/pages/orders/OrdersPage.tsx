@@ -135,7 +135,7 @@ export const OrdersPage = () => {
                 <p><strong>Email:</strong> {selectedOrder.customerEmail ?? 'Not provided'}</p>
                 <p><strong>Phone:</strong> {selectedOrder.customerPhone ?? 'Not provided'}</p>
                 <p><strong>Created:</strong> {new Date(selectedOrder.createdAt).toLocaleString()}</p>
-                <p className="capitalize"><strong>Payment:</strong> {selectedOrder.paymentStatus} via {paymentMethodLabel(selectedOrder.paymentMethod)}</p>
+                <p className="capitalize"><strong>Payment:</strong> {selectedOrder.paymentStatus} via {selectedOrder.paymentMethod}</p>
                 <p><strong>Loyalty:</strong> {loyaltyLabel[getLoyaltyState(selectedOrder)]}</p>
                 <p><strong>Loyalty Source:</strong> {selectedOrder.loyaltyStampedBy === 'automatic-order-confirmation' ? 'Automatic from order confirmation' : 'Not yet stamped'}</p>
                 <p><strong>Loyalty Note:</strong> {selectedOrder.loyaltyMessage ?? 'No loyalty activity yet.'}</p>
