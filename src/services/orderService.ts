@@ -11,6 +11,22 @@ const byRange = (rows: Order[], range: DateRangePreset) => {
   return rows.filter((row) => new Date(row.createdAt).getTime() >= cutoff);
 };
 
+const seedStamped = ordersSeed.find((order) => order.id === 'ORD-2100');
+if (seedStamped) {
+  const result = loyaltyService.grantStampForConfirmedOrder(seedStamped);
+  ordersSeed = ordersSeed.map((order) => (order.id === seedStamped.id
+    ? {
+      ...order,
+      loyaltyStampPreparedAt: result.stampedAt,
+      loyaltyStampStatus: result.granted ? 'stamp-awarded' : 'already-stamped',
+      loyaltyStampedAt: result.stampedAt,
+      loyaltyStampedBy: result.activity?.source,
+      loyaltyMessage: result.reason ?? (result.granted ? 'Stamp awarded from confirmed payment.' : 'Loyalty already applied.'),
+      loyaltyUnlockedRewards: result.unlockedRewards?.map((reward) => reward.reward) ?? [],
+    }
+    : order));
+}
+
 export const orderService = {
   async getOrders(filters?: OrderFilters): Promise<Order[]> {
     const range = filters?.range ?? '1M';
@@ -31,11 +47,13 @@ export const orderService = {
   async confirmPayment(orderId: string): Promise<Order> {
     const paidOrder = await ordersApi.confirmPayment(orderId);
 
-    if (!loyaltyService.canGrantStamp(paidOrder)) return paidOrder;
+    const paidOrder = current.paymentStatus === 'paid' ? current : { ...current, paymentStatus: 'paid' as const };
+    const stamp = loyaltyService.grantStampForConfirmedOrder(paidOrder);
 
     const stamp = await loyaltyService.grantStampForConfirmedOrder(paidOrder);
     return {
       ...paidOrder,
+      loyaltyStampPreparedAt: stamp.stampedAt ?? paidOrder.loyaltyStampPreparedAt,
       loyaltyStampStatus: stamp.granted ? 'stamp-awarded' : (stamp.reason === 'Order has already been stamped.' ? 'already-stamped' : 'not-eligible'),
       loyaltyStampedAt: stamp.stampedAt ?? paidOrder.loyaltyStampedAt,
       loyaltyStampedBy: stamp.activity?.source ?? paidOrder.loyaltyStampedBy,

@@ -59,6 +59,7 @@ export type Order = {
   createdAt: string;
   updatedAt: string;
   notes?: string;
+  loyaltyStampPreparedAt?: string;
   loyaltyStampStatus?: OrderLoyaltyStatus;
   loyaltyStampedAt?: string;
   loyaltyStampedBy?: 'automatic-order-confirmation' | 'manual-staff-adjustment';
