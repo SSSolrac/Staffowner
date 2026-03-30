@@ -10,17 +10,17 @@ import type { LoyaltyStampState, Order, OrderStatus } from '@/types/order';
 const statuses: Array<OrderStatus | 'all'> = ['all', 'pending', 'preparing', 'ready', 'completed', 'cancelled', 'refunded', 'out-for-delivery', 'delivered'];
 
 const getLoyaltyState = (order: Order): LoyaltyStampState => {
-  if (loyaltyService.hasAlreadyBeenStamped(order)) return 'already-stamped';
-  if (order.loyaltyStampPreparedAt) return 'granted';
-  if (loyaltyService.canGrantLoyaltyStamp(order)) return 'eligible';
+  if (order.loyaltyStampStatus === 'stamp-awarded') return 'granted';
+  if (order.loyaltyStampStatus === 'already-stamped' || loyaltyService.hasOrderAlreadyBeenStamped(order.id)) return 'already-stamped';
+  if (loyaltyService.canGrantStamp(order)) return 'eligible';
   return 'not-eligible';
 };
 
 const loyaltyLabel: Record<LoyaltyStampState, string> = {
-  'not-eligible': 'No loyalty credit',
-  eligible: 'Ready after payment',
-  granted: 'Loyalty credit queued',
-  'already-stamped': 'Loyalty applied',
+  'not-eligible': 'Not eligible',
+  eligible: 'Loyalty eligible',
+  granted: 'Stamp awarded',
+  'already-stamped': 'Already stamped',
 };
 
 const statusTone = (status: OrderStatus) => {
@@ -46,7 +46,7 @@ export const OrdersPage = () => {
         <div className="flex flex-wrap items-end gap-3 justify-between">
           <div>
             <h2 className="text-lg font-semibold">Orders Operations</h2>
-            <p className="text-sm text-[#6B7280]">Track order progress, confirm payments, and keep a clean service log.</p>
+            <p className="text-sm text-[#6B7280]">Track order progress, confirm payments, and auto-award loyalty stamps (10-stamp card: Free Latte at 6, Free Groom at 10).</p>
           </div>
           <DateRangeFilter value={range} onChange={setRange} />
         </div>
@@ -73,6 +73,7 @@ export const OrdersPage = () => {
           <tbody>
             {orders.map((order) => {
               const paid = order.paymentStatus === 'paid';
+              const loyaltyState = getLoyaltyState(order);
               return (
                 <tr className="border-t" key={order.id}>
                   <td className="font-medium">{order.id}</td>
@@ -88,11 +89,25 @@ export const OrdersPage = () => {
                     </div>
                   </td>
                   <td><StatusChip label={`${order.paymentStatus} · ${order.paymentMethod}`} tone={paid ? 'success' : 'warning'} /></td>
-                  <td>{loyaltyLabel[getLoyaltyState(order)]}</td>
+                  <td>
+                    <div>
+                      <p>{loyaltyLabel[loyaltyState]}</p>
+                      {order.loyaltyUnlockedRewards?.length ? <p className="text-xs text-emerald-700">Reward unlocked: {order.loyaltyUnlockedRewards.join(', ')}</p> : null}
+                    </div>
+                  </td>
                   <td className="space-x-2">
                     <button className="border rounded px-2 py-1" onClick={() => { setSelectedOrder(order); setNoteDraft(order.notes ?? ''); }}>Details</button>
-                    <button className="border rounded px-2 py-1 disabled:opacity-50" disabled={paid} onClick={async () => { const updated = await confirmPayment(order.id); toast.success(updated.loyaltyStampPreparedAt ? 'Payment confirmed and loyalty prepared.' : 'Payment confirmed.'); }}>
-                      {paid ? 'Payment Confirmed' : 'Confirm Payment'}
+                    <button
+                      className="border rounded px-2 py-1 disabled:opacity-50"
+                      disabled={paid && loyaltyState === 'already-stamped'}
+                      onClick={async () => {
+                        const updated = await confirmPayment(order.id);
+                        if (updated.loyaltyStampStatus === 'stamp-awarded') toast.success('Payment confirmed. 1 stamp auto-awarded.');
+                        else if (updated.loyaltyStampStatus === 'already-stamped') toast.info('Payment confirmed. Loyalty was already applied for this order.');
+                        else toast.success('Payment confirmed.');
+                      }}
+                    >
+                      {paid ? 'Recheck Payment' : 'Confirm Payment'}
                     </button>
                   </td>
                 </tr>
@@ -117,6 +132,9 @@ export const OrdersPage = () => {
                 <p><strong>Created:</strong> {new Date(selectedOrder.createdAt).toLocaleString()}</p>
                 <p className="capitalize"><strong>Payment:</strong> {selectedOrder.paymentStatus} via {selectedOrder.paymentMethod}</p>
                 <p><strong>Loyalty:</strong> {loyaltyLabel[getLoyaltyState(selectedOrder)]}</p>
+                <p><strong>Loyalty Source:</strong> {selectedOrder.loyaltyStampedBy === 'automatic-order-confirmation' ? 'Automatic from order confirmation' : 'Not yet stamped'}</p>
+                <p><strong>Loyalty Note:</strong> {selectedOrder.loyaltyMessage ?? 'No loyalty activity yet.'}</p>
+                {selectedOrder.loyaltyUnlockedRewards?.length ? <p><strong>Reward unlocked:</strong> {selectedOrder.loyaltyUnlockedRewards.join(', ')}</p> : null}
               </div>
 
               <div className="border rounded p-3 space-y-2 text-sm">
@@ -156,8 +174,18 @@ export const OrdersPage = () => {
 
             <div className="flex gap-2">
               <button className="border rounded px-3 py-1" onClick={async () => { const updated = await updateNotes(selectedOrder.id, noteDraft); setSelectedOrder(updated); toast.success('Order notes updated.'); }}>Save Notes</button>
-              <button className="border rounded px-3 py-1 disabled:opacity-50" disabled={selectedOrder.paymentStatus === 'paid'} onClick={async () => { const updated = await confirmPayment(selectedOrder.id); setSelectedOrder(updated); toast.success('Payment confirmed.'); }}>
-                {selectedOrder.paymentStatus === 'paid' ? 'Payment Confirmed' : 'Confirm Payment'}
+              <button
+                className="border rounded px-3 py-1 disabled:opacity-50"
+                disabled={selectedOrder.paymentStatus === 'paid' && getLoyaltyState(selectedOrder) === 'already-stamped'}
+                onClick={async () => {
+                  const updated = await confirmPayment(selectedOrder.id);
+                  setSelectedOrder(updated);
+                  if (updated.loyaltyStampStatus === 'stamp-awarded') toast.success('Payment confirmed. Stamp auto-awarded.');
+                  else if (updated.loyaltyStampStatus === 'already-stamped') toast.info('Payment already confirmed and stamp already applied.');
+                  else toast.success('Payment confirmed.');
+                }}
+              >
+                {selectedOrder.paymentStatus === 'paid' ? 'Recheck Payment' : 'Confirm Payment'}
               </button>
             </div>
           </div>

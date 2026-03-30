@@ -1,4 +1,5 @@
 import type { DateRangePreset } from './dashboard';
+import type { LoyaltyRewardName } from './loyalty';
 
 export type PaymentStatus = 'pending' | 'paid';
 export type PaymentMethod = 'cash' | 'card' | 'e-wallet';
@@ -25,6 +26,8 @@ export type OrderStatusHistoryItem = {
   note?: string;
 };
 
+export type OrderLoyaltyStatus = 'not-eligible' | 'eligible' | 'stamp-awarded' | 'already-stamped';
+
 export type Order = {
   id: string;
   customerId?: string;
@@ -43,6 +46,11 @@ export type Order = {
   createdAt: string;
   notes?: string;
   loyaltyStampPreparedAt?: string;
+  loyaltyStampStatus?: OrderLoyaltyStatus;
+  loyaltyStampedAt?: string;
+  loyaltyStampedBy?: 'automatic-order-confirmation' | 'manual-staff-adjustment';
+  loyaltyMessage?: string;
+  loyaltyUnlockedRewards?: LoyaltyRewardName[];
 };
 
 export type OrderFilters = {

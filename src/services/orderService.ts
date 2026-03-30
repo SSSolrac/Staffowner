@@ -118,10 +118,18 @@ const byRange = (rows: Order[], range: DateRangePreset) => {
 
 const seedStamped = ordersSeed.find((order) => order.id === 'ORD-2100');
 if (seedStamped) {
-  const result = loyaltyService.grantLoyaltyStamp(seedStamped);
-  if (result.granted && result.stampedAt) {
-    ordersSeed = ordersSeed.map((order) => (order.id === seedStamped.id ? { ...order, loyaltyStampPreparedAt: result.stampedAt } : order));
-  }
+  const result = loyaltyService.grantStampForConfirmedOrder(seedStamped);
+  ordersSeed = ordersSeed.map((order) => (order.id === seedStamped.id
+    ? {
+      ...order,
+      loyaltyStampPreparedAt: result.stampedAt,
+      loyaltyStampStatus: result.granted ? 'stamp-awarded' : 'already-stamped',
+      loyaltyStampedAt: result.stampedAt,
+      loyaltyStampedBy: result.activity?.source,
+      loyaltyMessage: result.reason ?? (result.granted ? 'Stamp awarded from confirmed payment.' : 'Loyalty already applied.'),
+      loyaltyUnlockedRewards: result.unlockedRewards?.map((reward) => reward.reward) ?? [],
+    }
+    : order));
 }
 
 export const orderService = {
@@ -144,11 +152,16 @@ export const orderService = {
     if (!current) throw new Error('Order not found');
 
     const paidOrder = current.paymentStatus === 'paid' ? current : { ...current, paymentStatus: 'paid' as const };
-    const stamp = loyaltyService.grantLoyaltyStamp(paidOrder);
+    const stamp = loyaltyService.grantStampForConfirmedOrder(paidOrder);
 
     const updated: Order = {
       ...paidOrder,
       loyaltyStampPreparedAt: stamp.stampedAt ?? paidOrder.loyaltyStampPreparedAt,
+      loyaltyStampStatus: stamp.granted ? 'stamp-awarded' : (stamp.reason === 'Order has already been stamped.' ? 'already-stamped' : 'not-eligible'),
+      loyaltyStampedAt: stamp.stampedAt ?? paidOrder.loyaltyStampedAt,
+      loyaltyStampedBy: stamp.activity?.source ?? paidOrder.loyaltyStampedBy,
+      loyaltyMessage: stamp.reason ?? (stamp.granted ? 'Stamp awarded from confirmed payment.' : paidOrder.loyaltyMessage),
+      loyaltyUnlockedRewards: stamp.unlockedRewards?.map((reward) => reward.reward) ?? paidOrder.loyaltyUnlockedRewards,
     };
 
     ordersSeed = ordersSeed.map((order) => (order.id === orderId ? updated : order));
