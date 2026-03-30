@@ -6,6 +6,7 @@ import { useCustomers } from '@/hooks/useCustomers';
 import { LOYALTY_MILESTONES, LOYALTY_TOTAL_STAMPS } from '@/types/loyalty';
 import type { Customer, CustomerTier } from '@/types/customer';
 
+type CustomerTier = 'Gold' | 'Silver' | 'Bronze' | 'Unranked';
 const tiers: Array<CustomerTier | 'All'> = ['All', 'Gold', 'Silver', 'Bronze', 'Unranked'];
 
 const nextMilestoneLabel = (customer: Customer) => {
@@ -24,16 +25,16 @@ export const CustomersLoyaltyPage = () => {
   const [granting, setGranting] = useState(false);
 
   const filtered = useMemo(() => customers.filter((customer) => {
-    const byQuery = customer.name.toLowerCase().includes(query.toLowerCase()) || customer.email.toLowerCase().includes(query.toLowerCase());
-    const byTier = tier === 'All' || customer.tier === tier;
+    const byQuery = customer.fullName.toLowerCase().includes(query.toLowerCase()) || (customer.email ?? '').toLowerCase().includes(query.toLowerCase());
+    const byTier = tier === 'All' || getTier(customer) === tier;
     return byQuery && byTier;
   }), [customers, query, tier]);
 
   const tierSummary = useMemo(() => ([
-    { tier: 'Gold', total: customers.filter((c) => c.tier === 'Gold').length },
-    { tier: 'Silver', total: customers.filter((c) => c.tier === 'Silver').length },
-    { tier: 'Bronze', total: customers.filter((c) => c.tier === 'Bronze').length },
-    { tier: 'Unranked', total: customers.filter((c) => c.tier === 'Unranked').length },
+    { tier: 'Gold', total: customers.filter((c) => getTier(c) === 'Gold').length },
+    { tier: 'Silver', total: customers.filter((c) => getTier(c) === 'Silver').length },
+    { tier: 'Bronze', total: customers.filter((c) => getTier(c) === 'Bronze').length },
+    { tier: 'Unranked', total: customers.filter((c) => getTier(c) === 'Unranked').length },
   ]), [customers]);
 
   if (loading) return <p>Loading customers...</p>;
@@ -71,7 +72,6 @@ export const CustomersLoyaltyPage = () => {
               ))}
             </tbody>
           </table>
-          {filtered.length === 0 && <p className="text-sm text-[#6B7280] mt-3">No customers matched your filters.</p>}
         </div>
         <aside className="rounded-lg border bg-white dark:bg-slate-800 p-4 space-y-3">
           <h3 className="font-medium">Customer activity snapshot</h3>
@@ -86,7 +86,7 @@ export const CustomersLoyaltyPage = () => {
       {selected && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-20">
           <div className="w-full max-w-xl rounded-lg border bg-white dark:bg-slate-800 p-4 space-y-3">
-            <div className="flex items-center justify-between"><h3 className="font-semibold">{selected.name}</h3><button className="border rounded px-2 py-1" onClick={() => setSelected(null)}>Close</button></div>
+            <div className="flex items-center justify-between"><h3 className="font-semibold">{selected.fullName}</h3><button className="border rounded px-2 py-1" onClick={() => setSelected(null)}>Close</button></div>
             <div className="grid sm:grid-cols-2 gap-2 text-sm">
               <p>Email: {selected.email}</p><p>Tier: {selected.tier}</p><p>Points: {selected.points}</p><p>Stamps: {selected.loyalty.currentStampCount}/{LOYALTY_TOTAL_STAMPS}</p>
             </div>

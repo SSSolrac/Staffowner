@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { customerService } from '@/services/customerService';
-import type { Customer } from '@/types/customer';
+import type { CustomerWithLoyalty } from '@/types/customer';
 
 export const useCustomers = () => {
-  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [customers, setCustomers] = useState<CustomerWithLoyalty[]>([]);
   const [loading, setLoading] = useState(true);
 
   const loadCustomers = useCallback(async () => {

@@ -1,23 +1,19 @@
-import type { UserRole } from './user';
-
-export type LoginStatus = 'success' | 'failed';
-
 export interface LoginHistoryEntry {
   id: string;
   userId: string;
   userName: string;
-  role: UserRole;
+  role: string;
   loginTime: string;
-  logoutTime?: string;
-  ipAddress: string;
-  device: string;
-  loginStatus: LoginStatus;
+  logoutTime?: string | null;
+  ipAddress?: string | null;
+  device?: string | null;
+  loginStatus: string;
 }
 
 export interface LoginHistoryFilters {
   query: string;
-  role: UserRole | 'all';
-  status: LoginStatus | 'all';
+  role: string;
+  status: string;
   date: string;
   page: number;
   pageSize: number;

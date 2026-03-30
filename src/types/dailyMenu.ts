@@ -1,24 +1,16 @@
 export type DailyMenuItem = {
   id: string;
-  name: string;
-  description?: string;
+  dailyMenuId: string;
+  menuItemId: string;
+  isAvailable: boolean;
+  sortOrder: number;
 };
-
-export type DailyMenuCategory = {
-  id: string;
-  name: string;
-  items: DailyMenuItem[];
-};
-
-export type DailyMenuMode = 'manual' | 'date-based';
 
 export type DailyMenu = {
   id: string;
-  title: string;
-  subtitle: string;
-  date?: string;
-  isActive: boolean;
-  mode: DailyMenuMode;
-  categories: DailyMenuCategory[];
+  menuDate: string;
+  isPublished: boolean;
+  createdAt: string;
   updatedAt: string;
+  items: DailyMenuItem[];
 };

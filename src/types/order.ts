@@ -52,7 +52,7 @@ export type Order = {
   discount: number;
   total: number;
   status: OrderStatus;
-  statusHistory: OrderStatusHistoryItem[];
+  statusTimeline?: OrderStatusHistory[];
   paymentStatus: PaymentStatus;
   paymentMethod: PaymentMethod;
   receiptImageUrl?: string;
