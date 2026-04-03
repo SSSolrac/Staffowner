@@ -98,7 +98,10 @@ export const mockApi = {
     if (method === 'GET' && p === '/api/auth/login-history') return clone({ rows: data.loginHistory, total: data.loginHistory.length }) as T;
     if (method === 'GET' && p === '/api/auth/login-history/stats') return clone({ totalToday: data.loginHistory.length, failed: data.loginHistory.filter((r) => r.loginStatus !== 'success').length, staff: data.loginHistory.filter((r) => r.role === 'staff').length, customer: data.loginHistory.filter((r) => r.role === 'customer').length }) as T;
 
-    if (method === 'GET' && p === '/api/dashboard') return clone(ok(dashboard(data.orders))) as T;
+    if (method === 'GET' && p === '/api/dashboard') {
+      const range = String(query?.range ?? 'today') as DateRangePreset;
+      return clone(ok(dashboard(data.orders, range))) as T;
+    }
     if (method === 'GET' && p === '/api/orders') return clone(ok(data.orders)) as T;
     const orderMatch = p.match(/^\/api\/orders\/([^/]+)$/);
     if (method === 'GET' && orderMatch) return clone(ok(data.orders.find((o) => o.id === orderMatch[1]))) as T;
