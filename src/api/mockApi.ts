@@ -1,7 +1,8 @@
-import type { CustomerProfile, LoyaltyAccount } from '@/types/customer';
+import type { CustomerProfile } from '@/types/customer';
 import type { DailyMenu } from '@/types/dailyMenu';
-import type { DashboardSummary, DateRangePreset } from '@/types/dashboard';
+import type { DashboardData, DateRangePreset } from '@/types/dashboard';
 import type { LoginHistoryEntry } from '@/types/loginHistory';
+import type { LoyaltyAccount } from '@/types/loyalty';
 import type { MenuItem } from '@/types/menuItem';
 import type { Order, OrderStatus, PaymentStatus } from '@/types/order';
 import type { SessionUser, UserRole } from '@/types/user';
@@ -31,24 +32,66 @@ const getDb = (): Db => {
   const menuItems: MenuItem[] = [
     { id: 'mi-1', categoryId: 'coffee', name: 'Latte', description: '', price: 150, isAvailable: true, imageUrl: null, stock: 12, lowStockThreshold: 5, inventoryStatus: 'in_stock', discount: 0, createdAt: now(), updatedAt: now() },
   ];
-  const customers: CustomerProfile[] = [{ id: 'cus-1', fullName: 'Mia Santos', email: 'mia@example.com', createdAt: now(), updatedAt: now() }];
+  const customers: CustomerProfile[] = [{ id: 'cus-1', name: 'Mia Santos', email: 'mia@example.com', phone: '', addresses: [], preferences: {}, createdAt: now(), updatedAt: now() }];
   const orders: Order[] = [{ id: 'ord-1', orderNumber: 'ORD-1', customerId: 'cus-1', customerName: 'Mia Santos', orderType: 'pickup', items: [{ id: 'oi-1', orderId: 'ord-1', menuItemId: 'mi-1', itemName: 'Latte', qty: 1, unitPrice: 150, lineTotal: 150 }], subtotal: 150, serviceFee: 0, discount: 0, total: 150, status: 'pending', paymentStatus: 'pending', paymentMethod: 'gcash', createdAt: now(), updatedAt: now(), statusTimeline: [] }];
   const dailyMenu: DailyMenu = { id: 'dm-1', menuDate: now().slice(0, 10), isPublished: false, createdAt: now(), updatedAt: now(), items: [{ id: 'dmi-1', menuItemId: 'mi-1', name: 'Latte', price: 150, categoryId: 'coffee', isAvailable: true }] };
-  const loyalty: Record<string, LoyaltyAccount> = { 'cus-1': { customerId: 'cus-1', stampCount: 1, availableRewards: [], redeemedRewards: [], updatedAt: now() } };
+  const loyalty: Record<string, LoyaltyAccount> = {
+    'cus-1': {
+      customerId: 'cus-1',
+      stampCount: 1,
+      availableRewards: [{ id: 'rw-1', label: 'Free Cookie', requiredStamps: 10 }],
+      redeemedRewards: [],
+      updatedAt: now(),
+    },
+  };
   db = { menuItems, dailyMenu, orders, customers, loyalty, loginHistory: [], profile: customers[0] };
   return db;
 };
 
-const dashboard = (orders: Order[]): DashboardSummary => {
-  const paid = orders.filter((o) => o.paymentStatus === 'paid');
-  const total = orders.length;
-  const byStatus = { pending: 0, preparing: 0, ready: 0, out_for_delivery: 0, completed: 0, delivered: 0, cancelled: 0, refunded: 0 };
-  orders.forEach((o) => { byStatus[o.status] += 1; });
+const withinRange = (orderDate: string, range: DateRangePreset): boolean => {
+  if (range === 'today') return orderDate.slice(0, 10) === new Date().toISOString().slice(0, 10);
+
+  const days = range === '7d' ? 7 : range === '30d' ? 30 : 90;
+  const start = new Date();
+  start.setUTCDate(start.getUTCDate() - (days - 1));
+  start.setUTCHours(0, 0, 0, 0);
+  return new Date(orderDate) >= start;
+};
+
+const dashboard = (orders: Order[], range: DateRangePreset): DashboardData => {
+  const today = new Date().toISOString().slice(0, 10);
+  const rangeOrders = orders.filter((o) => withinRange(o.createdAt, range));
+  const paidRangeOrders = rangeOrders.filter((o) => o.paymentStatus === 'paid');
+  const todayOrders = orders.filter((o) => o.createdAt.slice(0, 10) === today);
+
+  const topItemMap = new Map<string, { itemName: string; quantity: number; revenue: number }>();
+  rangeOrders.forEach((order) => {
+    order.items.forEach((item) => {
+      const current = topItemMap.get(item.itemName) ?? { itemName: item.itemName, quantity: 0, revenue: 0 };
+      current.quantity += item.qty;
+      current.revenue += item.lineTotal;
+      topItemMap.set(item.itemName, current);
+    });
+  });
+
   return {
-    sales: { today: paid.reduce((s, o) => s + o.total, 0), rangeTotal: paid.reduce((s, o) => s + o.total, 0), averageOrderValue: paid.length ? paid.reduce((s, o) => s + o.total, 0) / paid.length : 0 },
-    orders: { total, byStatus },
-    topItems: [],
-    recentOrders: orders,
+    sales: {
+      today: paidRangeOrders.filter((o) => o.createdAt.slice(0, 10) === today).reduce((sum, o) => sum + o.total, 0),
+      rangeTotal: paidRangeOrders.reduce((sum, o) => sum + o.total, 0),
+      averageOrderValue: paidRangeOrders.length ? paidRangeOrders.reduce((sum, o) => sum + o.total, 0) / paidRangeOrders.length : 0,
+    },
+    orders: {
+      today: todayOrders.length,
+      rangeTotal: rangeOrders.length,
+      pending: rangeOrders.filter((o) => o.status === 'pending').length,
+      preparing: rangeOrders.filter((o) => o.status === 'preparing').length,
+      ready: rangeOrders.filter((o) => o.status === 'ready').length,
+      outForDelivery: rangeOrders.filter((o) => o.status === 'out_for_delivery').length,
+      completed: rangeOrders.filter((o) => o.status === 'completed').length,
+      cancelled: rangeOrders.filter((o) => o.status === 'cancelled').length,
+    },
+    topItems: [...topItemMap.values()].sort((a, b) => b.quantity - a.quantity).slice(0, 5),
+    recentOrders: rangeOrders,
     alerts: [],
   };
 };
@@ -76,7 +119,10 @@ export const mockApi = {
     if (method === 'GET' && p === '/api/auth/login-history') return clone({ rows: data.loginHistory, total: data.loginHistory.length }) as T;
     if (method === 'GET' && p === '/api/auth/login-history/stats') return clone({ totalToday: data.loginHistory.length, failed: data.loginHistory.filter((r) => r.loginStatus !== 'success').length, staff: data.loginHistory.filter((r) => r.role === 'staff').length, customer: data.loginHistory.filter((r) => r.role === 'customer').length }) as T;
 
-    if (method === 'GET' && p === '/api/dashboard') return clone(ok(dashboard(data.orders))) as T;
+    if (method === 'GET' && p === '/api/dashboard') {
+      const range = String(query?.range ?? 'today') as DateRangePreset;
+      return clone(ok(dashboard(data.orders, range))) as T;
+    }
     if (method === 'GET' && p === '/api/orders') return clone(ok(data.orders)) as T;
     const orderMatch = p.match(/^\/api\/orders\/([^/]+)$/);
     if (method === 'GET' && orderMatch) return clone(ok(data.orders.find((o) => o.id === orderMatch[1]))) as T;
@@ -108,7 +154,9 @@ export const mockApi = {
       return clone(ok(data.profile)) as T;
     }
     const loyaltyMatch = p.match(/^\/api\/loyalty\/([^/]+)$/);
-    if (method === 'GET' && loyaltyMatch) return clone(ok(data.loyalty[loyaltyMatch[1]] ?? { customerId: loyaltyMatch[1], stampCount: 0, availableRewards: [], redeemedRewards: [], updatedAt: now() })) as T;
+    if (method === 'GET' && loyaltyMatch) {
+      return clone(ok(data.loyalty[loyaltyMatch[1]] ?? { customerId: loyaltyMatch[1], stampCount: 0, availableRewards: [], redeemedRewards: [], updatedAt: now() })) as T;
+    }
 
     if (method === 'GET' && p === '/api/menu') return clone(ok(data.menuItems)) as T;
     if (method === 'POST' && p === '/api/menu') {
