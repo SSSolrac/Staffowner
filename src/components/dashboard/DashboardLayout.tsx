@@ -12,7 +12,7 @@ export const DashboardLayout = () => {
   const { user, logout } = useAuth();
   const { notifications, unreadCount, markRead, markAllRead } = useNotifications();
   const navigate = useNavigate();
-  const isAdmin = user?.role === 'admin';
+  const isOwner = user?.role === 'owner';
 
   const onSignOut = async () => {
     localStorage.clear();
@@ -33,11 +33,11 @@ export const DashboardLayout = () => {
             <NavLink className={({ isActive }) => `${navBaseClass} ${isActive ? 'bg-[#FFB6C1]' : ''}`} to="/daily-menu">Daily Menu</NavLink>
             <NavLink className={({ isActive }) => `${navBaseClass} ${isActive ? 'bg-[#FFB6C1]' : ''}`} to="/menu">Menu</NavLink>
             <NavLink className={({ isActive }) => `${navBaseClass} ${isActive ? 'bg-[#FFB6C1]' : ''}`} to="/customers">Customers / Loyalty</NavLink>
-            {isAdmin && <NavLink className={({ isActive }) => `${navBaseClass} ${isActive ? 'bg-[#FFB6C1]' : ''}`} to="/imports">Imports / Reports</NavLink>}
+            {isOwner && <NavLink className={({ isActive }) => `${navBaseClass} ${isActive ? 'bg-[#FFB6C1]' : ''}`} to="/imports">Imports / Reports</NavLink>}
             <NavLink className={({ isActive }) => `${navBaseClass} ${isActive ? 'bg-[#FFB6C1]' : ''}`} to="/settings">Settings</NavLink>
             <NavLink className={({ isActive }) => `${navBaseClass} ${isActive ? 'bg-[#FFB6C1]' : ''}`} to="/profile">Profile</NavLink>
-            {isAdmin && <NavLink className={({ isActive }) => `${navBaseClass} ${isActive ? 'bg-[#FFB6C1]' : ''}`} to="/admin/activity-log">Admin Logs</NavLink>}
-            {isAdmin && <NavLink className={({ isActive }) => `${navBaseClass} ${isActive ? 'bg-[#FFB6C1]' : ''}`} to="/admin/login-history">Login History</NavLink>}
+            {isOwner && <NavLink className={({ isActive }) => `${navBaseClass} ${isActive ? 'bg-[#FFB6C1]' : ''}`} to="/admin/activity-log">Owner Logs</NavLink>}
+            {isOwner && <NavLink className={({ isActive }) => `${navBaseClass} ${isActive ? 'bg-[#FFB6C1]' : ''}`} to="/admin/login-history">Login History</NavLink>}
           </div>
 
           <div className="mt-auto pt-4 border-t border-[#F3D6DB]">
@@ -79,7 +79,7 @@ export const DashboardLayout = () => {
           </main>
         </section>
       </div>
-      <MobileNav isAdmin={Boolean(isAdmin)} />
+      <MobileNav isOwner={Boolean(isOwner)} />
     </div>
   );
 };

@@ -6,6 +6,7 @@ const mapCustomer = (raw: unknown): CustomerProfile => {
   const row = asRecord(raw) ?? {};
   return {
     id: String(row.id ?? ''),
+    customerCode: String(row.customerCode ?? ''),
     name: String(row.name ?? ''),
     email: String(row.email ?? ''),
     phone: String(row.phone ?? ''),

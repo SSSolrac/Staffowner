@@ -5,3 +5,5 @@ export * from './dashboard';
 export * from './loyalty';
 export * from './menu';
 export * from './orders';
+
+export * from './ingredients';

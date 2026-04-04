@@ -23,12 +23,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const session = await authService.login(email, password, role, navigator.userAgent);
     setUser(session);
     localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
   };
 
   const logout = async () => {
     if (user) await loginHistoryService.recordLogout(user.id);
     setUser(null);
     localStorage.removeItem(SESSION_KEY);
+    sessionStorage.removeItem(SESSION_KEY);
   };
 
   const value = useMemo(() => ({ user, login, logout }), [user]);

@@ -2,6 +2,7 @@ import type { LoyaltyAccount } from './loyalty';
 
 export interface CustomerProfile {
   id: string;
+  customerCode: string;
   name: string;
   email: string;
   phone: string;

@@ -8,3 +8,4 @@ export * from './useDailyMenu';
 export * from './useMenuItems';
 
 export * from './useNotifications';
+export * from './useIngredients';

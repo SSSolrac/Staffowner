@@ -52,11 +52,13 @@ const parseResponse = async <T>(response: Response): Promise<T> => {
   }
 
   if (!response.ok) {
-    const payloadMessage = payload && typeof payload === 'object' && 'message' in payload
-      ? String((payload as { message: unknown }).message)
-      : typeof payload === 'string'
-        ? payload
-        : response.statusText;
+    const payloadMessage = payload && typeof payload === 'object' && 'error' in payload
+      ? String((payload as { error: unknown }).error)
+      : payload && typeof payload === 'object' && 'message' in payload
+        ? String((payload as { message: unknown }).message)
+        : typeof payload === 'string'
+          ? payload
+          : response.statusText;
 
     throw new ApiError(payloadMessage || 'Request failed', response.status);
   }

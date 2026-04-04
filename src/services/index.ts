@@ -10,3 +10,4 @@ export * from './csvImportService';
 export * from './menuService';
 
 export * from './notificationService';
+export * from './ingredientService';

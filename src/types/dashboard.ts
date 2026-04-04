@@ -1,6 +1,6 @@
 import type { Order } from './order';
 
-export type DateRangePreset = 'today' | '7d' | '30d' | '90d';
+export type DateRangePreset = 'today' | '7d' | '30d' | '3m' | '6m' | '90d' | '1y' | 'all';
 
 export type Alert = {
   id: string;
@@ -46,6 +46,12 @@ export type SalesImportMergeResult = {
     start: string;
     end: string;
   };
+};
+
+export type SalesImportPreview = {
+  validRows: Record<string, string>[];
+  invalidRows: Array<{ rowNumber: number; reason: string; row: Record<string, string> }>;
+  summary: { totalRows: number; validCount: number; invalidCount: number };
 };
 
 export type CsvImportType = 'orders' | 'customers' | 'menu-items' | 'sales';

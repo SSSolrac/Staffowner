@@ -1,9 +1,9 @@
 import type { DateRangePreset } from '@/types/dashboard';
 
-const options: DateRangePreset[] = ['today', '7d', '30d', '90d'];
+const options: DateRangePreset[] = ['today', '7d', '30d', '3m', '6m', '1y', 'all'];
 
 export const DateRangeFilter = ({ value, onChange }: { value: DateRangePreset; onChange: (value: DateRangePreset) => void }) => (
-  <div className="rounded-lg border bg-white dark:bg-slate-800 p-2 inline-flex gap-2">
+  <div className="rounded-lg border bg-white dark:bg-slate-800 p-2 inline-flex gap-2 flex-wrap">
     {options.map((option) => (
       <button
         key={option}

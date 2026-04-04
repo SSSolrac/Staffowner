@@ -10,7 +10,7 @@ export const loginHistoryService = {
     await authApi.recordLoginHistory({
       userId,
       userName: 'unknown',
-      role: 'staff',
+      role: 'owner',
       loginTime: new Date().toISOString(),
       logoutTime: new Date().toISOString(),
       ipAddress: '0.0.0.0',

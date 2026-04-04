@@ -39,7 +39,7 @@ export const DailyMenuPage = () => {
           </div>
           {draft.items.map((item, index) => (
             <div key={item.id} className="border rounded p-3 space-y-2">
-              <label className="text-sm">Menu Item ID
+              <label className="text-sm">Menu Item (code + id)
                 <input className="block border rounded mt-1 px-2 py-1 w-full" value={item.menuItemId} onChange={(e) => setDraft({ ...draft, items: draft.items.map((x) => (x.id === item.id ? { ...x, menuItemId: e.target.value } : x)) })} />
               </label>
               <label className="text-sm">Name
@@ -49,7 +49,7 @@ export const DailyMenuPage = () => {
                 <label><input type="checkbox" checked={item.isAvailable} onChange={(e) => setDraft({ ...draft, items: draft.items.map((x) => (x.id === item.id ? { ...x, isAvailable: e.target.checked } : x)) })} /> Available</label>
                 <button className="border rounded px-2 py-1" onClick={() => setDraft({ ...draft, items: draft.items.filter((x) => x.id !== item.id).map((x) => x) })}>Remove</button>
               </div>
-              <p className="text-xs text-[#6B7280]">Sort order: {index + 1}</p>
+              <p className="text-xs text-[#6B7280]">Use stable menu item code + name format (example: MI-00001 · Latte). Sort order: {index + 1}</p>
             </div>
           ))}
         </div>
@@ -67,7 +67,7 @@ export const DailyMenuPage = () => {
         <p className="text-sm">Date: {draft.menuDate}</p>
         <p className="text-sm">State: {draft.isPublished ? 'Live for customers' : 'Not currently visible to customers'}</p>
         <div className="space-y-2">
-          {draft.items.map((item) => <div key={item.id} className="border rounded p-3 text-sm">Menu Item ID: {item.menuItemId || 'Unset'} · {item.isAvailable ? 'Available' : 'Unavailable'}</div>)}
+          {draft.items.map((item) => <div key={item.id} className="border rounded p-3 text-sm">Menu Item (code + id): {item.menuItemId || 'Unset'} · {item.isAvailable ? 'Available' : 'Unavailable'}</div>)}
         </div>
       </section>
     </div>

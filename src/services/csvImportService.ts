@@ -1,22 +1,14 @@
-import type { CsvImportType, CsvValidationResult, SalesImportMergeResult } from '@/types/dashboard';
+import type { CsvImportType, CsvValidationResult, SalesImportMergeResult, SalesImportPreview } from '@/types/dashboard';
 import { apiClient } from '@/api/client';
 
 const splitCsvLine = (line: string): string[] => {
   const values: string[] = [];
   let current = '';
   let inQuotes = false;
-
   for (let i = 0; i < line.length; i += 1) {
     const char = line[i];
-    if (char === '"') {
-      inQuotes = !inQuotes;
-      continue;
-    }
-    if (char === ',' && !inQuotes) {
-      values.push(current.trim());
-      current = '';
-      continue;
-    }
+    if (char === '"') { inQuotes = !inQuotes; continue; }
+    if (char === ',' && !inQuotes) { values.push(current.trim()); current = ''; continue; }
     current += char;
   }
   values.push(current.trim());
@@ -28,7 +20,6 @@ export const csvImportService = {
     const text = await file.text();
     const lines = text.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
     if (lines.length < 2) return [];
-
     const headers = splitCsvLine(lines[0]);
     return lines.slice(1).map((line) => {
       const values = splitCsvLine(line);
@@ -46,37 +37,26 @@ export const csvImportService = {
       'menu-items': ['item_name', 'category', 'price'],
       sales: ['date', 'sales_total'],
     };
-
     const required = requiredColumns[type];
     const invalidRows: CsvValidationResult['invalidRows'] = [];
     const validRows: CsvValidationResult['validRows'] = [];
-
     rows.forEach((row, index) => {
       const missing = required.filter((column) => !row[column]?.trim());
-      if (missing.length) {
-        invalidRows.push({
-          rowNumber: index + 2,
-          reason: `Missing required column values: ${missing.join(', ')}`,
-          row,
-        });
-        return;
-      }
-
-      if (type === 'sales') {
-        const amount = Number(row.sales_total ?? row.sales);
-        if (!Number.isFinite(amount) || amount < 0) {
-          invalidRows.push({ rowNumber: index + 2, reason: 'sales_total must be a positive number.', row });
-          return;
-        }
-      }
-
+      if (missing.length) return invalidRows.push({ rowNumber: index + 2, reason: `Missing required column values: ${missing.join(', ')}`, row });
       validRows.push(row);
     });
-
     return { validRows, invalidRows };
   },
 
-  async importCsvData(type: CsvImportType, rows: Record<string, string>[]): Promise<{ imported: number } | SalesImportMergeResult> {
-    return apiClient.post<{ imported: number } | SalesImportMergeResult>('/api/imports/csv', { type, rows });
+  previewSalesImport(rows: Record<string, string>[]): Promise<SalesImportPreview> {
+    return apiClient.post('/api/imports/sales/preview', { rows }).then((r) => (r as { data: SalesImportPreview }).data);
+  },
+
+  importSales(rows: Record<string, string>[]): Promise<SalesImportMergeResult> {
+    return apiClient.post('/api/imports/sales', { rows }).then((r) => (r as { data: SalesImportMergeResult }).data);
+  },
+
+  listHistory(): Promise<Array<{ id: string; type: string; totalRows: number; validRows: number; invalidRows: number; importedAt: string }>> {
+    return apiClient.get('/api/imports/history').then((r) => (r as { data: Array<{ id: string; type: string; totalRows: number; validRows: number; invalidRows: number; importedAt: string }> }).data);
   },
 };
