@@ -1,21 +1,59 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { useDailyMenu } from '@/hooks/useDailyMenu';
-import type { DailyMenu } from '@/types/dailyMenu';
+import { useMenuItems } from '@/hooks/useMenuItems';
+import type { DailyMenu, DailyMenuItem } from '@/types/dailyMenu';
 
-const makeId = () => Math.random().toString(36).slice(2, 9);
-const emptyMenu = (): DailyMenu => ({ id: '', menuDate: new Date().toISOString().slice(0, 10), isPublished: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), items: [] });
+const emptyMenu = (menuDate: string): DailyMenu => ({
+  id: '',
+  menuDate,
+  isPublished: false,
+  createdBy: null,
+  createdAt: '',
+  updatedAt: '',
+  items: [],
+});
+
+const buildDraftItem = (params: { dailyMenuId: string; menuItemId: string }): DailyMenuItem => ({
+  id: '',
+  dailyMenuId: params.dailyMenuId,
+  menuItemId: params.menuItemId,
+  createdAt: '',
+});
 
 export const DailyMenuPage = () => {
-  const { menu, loading, error, saving, saveDraft, publish, unpublish, clearMenu } = useDailyMenu();
-  const [draft, setDraft] = useState<DailyMenu>(emptyMenu());
+  const { items: menuItems } = useMenuItems();
+  const { menuDate, setMenuDate, menu, loading, error, saving, saveDraft, publish, unpublish, clearMenu } = useDailyMenu();
+  const [draft, setDraft] = useState<DailyMenu>(() => emptyMenu(menuDate));
+  const [menuItemToAdd, setMenuItemToAdd] = useState('');
 
   useEffect(() => {
-    if (menu) setDraft(menu);
-  }, [menu]);
+    setDraft(menu ?? emptyMenu(menuDate));
+  }, [menu, menuDate]);
+
+  const byId = useMemo(() => new Map(menuItems.map((item) => [item.id, item])), [menuItems]);
 
   if (loading) return <p>Loading daily menu...</p>;
   if (error) return <p className="text-red-600">{error}</p>;
+
+  const addItem = () => {
+    if (!menuItemToAdd) return;
+    if (draft.items.some((item) => item.menuItemId === menuItemToAdd)) {
+      toast.info('Item already in this daily menu.');
+      setMenuItemToAdd('');
+      return;
+    }
+
+    setDraft((current) => ({
+      ...current,
+      items: [...current.items, buildDraftItem({ dailyMenuId: current.id, menuItemId: menuItemToAdd })],
+    }));
+    setMenuItemToAdd('');
+  };
+
+  const removeItem = (menuItemId: string) => {
+    setDraft((current) => ({ ...current, items: current.items.filter((item) => item.menuItemId !== menuItemId) }));
+  };
 
   return (
     <div className="grid lg:grid-cols-2 gap-4">
@@ -23,53 +61,130 @@ export const DailyMenuPage = () => {
         <div className="flex items-start justify-between gap-3">
           <div>
             <h2 className="text-lg font-semibold">Daily Menu Management</h2>
-            <p className="text-sm text-[#6B7280] dark:text-slate-300">Manage canonical daily menu records from backend API.</p>
+            <p className="text-sm text-[#6B7280] dark:text-slate-300">Build and publish daily menus from canonical daily menu tables.</p>
           </div>
-          <span className={`text-xs px-2 py-1 rounded ${draft.isPublished ? 'bg-green-100 text-green-700' : 'bg-[#FFE4E8] text-slate-700'}`}>{draft.isPublished ? 'Published' : 'Draft'}</span>
+          <span
+            className={`text-xs px-2 py-1 rounded ${draft.isPublished ? 'bg-green-100 text-green-700' : 'bg-[#FFE4E8] text-slate-700'}`}
+          >
+            {draft.isPublished ? 'Published' : 'Draft'}
+          </span>
         </div>
 
         <div className="grid sm:grid-cols-2 gap-3">
-          <label className="text-sm">Menu Date<input type="date" className="block border rounded mt-1 px-2 py-1 w-full" value={draft.menuDate} onChange={(e) => setDraft({ ...draft, menuDate: e.target.value })} /></label>
+          <label className="text-sm">
+            Menu Date
+            <input
+              type="date"
+              className="block border rounded mt-1 px-2 py-1 w-full"
+              value={menuDate}
+              onChange={(e) => setMenuDate(e.target.value)}
+            />
+          </label>
         </div>
 
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-end justify-between gap-2">
             <h3 className="font-medium">Daily Menu Items</h3>
-            <button className="border rounded px-2 py-1" onClick={() => setDraft({ ...draft, items: [...draft.items, { id: `dmi-${makeId()}`, menuItemId: '', name: '', price: 0, categoryId: '', isAvailable: true }] })}>Add item</button>
-          </div>
-          {draft.items.map((item, index) => (
-            <div key={item.id} className="border rounded p-3 space-y-2">
-              <label className="text-sm">Menu Item (code + id)
-                <input className="block border rounded mt-1 px-2 py-1 w-full" value={item.menuItemId} onChange={(e) => setDraft({ ...draft, items: draft.items.map((x) => (x.id === item.id ? { ...x, menuItemId: e.target.value } : x)) })} />
-              </label>
-              <label className="text-sm">Name
-                <input className="block border rounded mt-1 px-2 py-1 w-full" value={item.name} onChange={(e) => setDraft({ ...draft, items: draft.items.map((x) => (x.id === item.id ? { ...x, name: e.target.value } : x)) })} />
-              </label>
-              <div className="flex items-center gap-3 text-sm">
-                <label><input type="checkbox" checked={item.isAvailable} onChange={(e) => setDraft({ ...draft, items: draft.items.map((x) => (x.id === item.id ? { ...x, isAvailable: e.target.checked } : x)) })} /> Available</label>
-                <button className="border rounded px-2 py-1" onClick={() => setDraft({ ...draft, items: draft.items.filter((x) => x.id !== item.id).map((x) => x) })}>Remove</button>
-              </div>
-              <p className="text-xs text-[#6B7280]">Use stable menu item code + name format (example: MI-00001 · Latte). Sort order: {index + 1}</p>
+            <div className="flex gap-2 items-end">
+              <select className="border rounded px-2 py-1 text-sm" value={menuItemToAdd} onChange={(e) => setMenuItemToAdd(e.target.value)}>
+                <option value="">Select menu item</option>
+                {menuItems.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.code} · {item.name}
+                  </option>
+                ))}
+              </select>
+              <button className="border rounded px-2 py-1" onClick={addItem} disabled={!menuItemToAdd}>
+                Add item
+              </button>
             </div>
-          ))}
+          </div>
+
+          {draft.items.length === 0 ? (
+            <p className="text-sm text-[#6B7280]">No items selected yet.</p>
+          ) : (
+            <div className="space-y-2">
+              {draft.items.map((item) => {
+                const menuItem = byId.get(item.menuItemId);
+                const label = menuItem ? `${menuItem.code} · ${menuItem.name}` : item.menuItemId;
+                return (
+                  <div key={item.menuItemId} className="border rounded p-3 flex items-center justify-between gap-2 text-sm">
+                    <p>{label}</p>
+                    <button className="border rounded px-2 py-1" onClick={() => removeItem(item.menuItemId)}>
+                      Remove
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <button className="border rounded px-3 py-1" disabled={saving} onClick={async () => { const saved = await saveDraft(draft); setDraft(saved); toast.success('Daily menu draft saved.'); }}>Save Draft</button>
-          <button className="border rounded px-3 py-1" disabled={saving} onClick={async () => { const saved = await publish(draft); setDraft(saved); toast.success('Daily menu published.'); }}>Publish Menu</button>
-          <button className="border rounded px-3 py-1" disabled={saving} onClick={async () => { const saved = await unpublish(); setDraft(saved); toast.info('Daily menu unpublished.'); }}>Unpublish</button>
-          <button className="border rounded px-3 py-1" disabled={saving} onClick={async () => { const saved = await clearMenu(); setDraft(saved); toast.info('Daily menu cleared.'); }}>Clear Menu</button>
+          <button
+            className="border rounded px-3 py-1"
+            disabled={saving}
+            onClick={async () => {
+              const saved = await saveDraft({ ...draft, menuDate });
+              setDraft(saved);
+              toast.success('Daily menu draft saved.');
+            }}
+          >
+            Save Draft
+          </button>
+          <button
+            className="border rounded px-3 py-1"
+            disabled={saving}
+            onClick={async () => {
+              const saved = await publish({ ...draft, menuDate });
+              setDraft(saved);
+              toast.success('Daily menu published.');
+            }}
+          >
+            Publish Menu
+          </button>
+          <button
+            className="border rounded px-3 py-1"
+            disabled={saving}
+            onClick={async () => {
+              const saved = await unpublish();
+              setDraft(saved);
+              toast.info('Daily menu unpublished.');
+            }}
+          >
+            Unpublish
+          </button>
+          <button
+            className="border rounded px-3 py-1"
+            disabled={saving}
+            onClick={async () => {
+              const saved = await clearMenu();
+              setDraft(saved);
+              toast.info('Daily menu cleared.');
+            }}
+          >
+            Clear Menu
+          </button>
         </div>
       </section>
 
       <section className="rounded-lg border bg-white dark:bg-slate-800 p-4 space-y-3">
         <h3 className="font-semibold">Owner Preview</h3>
-        <p className="text-sm">Date: {draft.menuDate}</p>
+        <p className="text-sm">Date: {menuDate}</p>
         <p className="text-sm">State: {draft.isPublished ? 'Live for customers' : 'Not currently visible to customers'}</p>
         <div className="space-y-2">
-          {draft.items.map((item) => <div key={item.id} className="border rounded p-3 text-sm">Menu Item (code + id): {item.menuItemId || 'Unset'} · {item.isAvailable ? 'Available' : 'Unavailable'}</div>)}
+          {draft.items.map((item) => {
+            const menuItem = byId.get(item.menuItemId);
+            const label = menuItem ? `${menuItem.code} · ${menuItem.name}` : item.menuItemId;
+            return (
+              <div key={`preview-${item.menuItemId}`} className="border rounded p-3 text-sm">
+                {label}
+              </div>
+            );
+          })}
         </div>
       </section>
     </div>
   );
 };
+

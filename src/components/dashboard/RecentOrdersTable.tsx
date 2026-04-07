@@ -7,21 +7,21 @@ export const RecentOrdersTable = ({ title, rows }: { title: string; rows: Order[
     <table className="w-full text-sm min-w-[640px]">
       <thead>
         <tr className="text-left">
-          <th>Order ID</th>
+          <th>Order</th>
           <th>Customer</th>
           <th>Status</th>
           <th>Total</th>
-          <th>Created</th>
+          <th>Placed</th>
         </tr>
       </thead>
       <tbody>
         {rows.map((row) => (
           <tr key={row.id} className="border-t">
-            <td>{row.orderNumber}</td>
-            <td>{row.customerName}</td>
+            <td>{row.code}</td>
+            <td>{row.customer?.name || row.customer?.customerCode || row.customerId || 'Guest'}</td>
             <td className="capitalize">{row.status.replaceAll('_', ' ')}</td>
-            <td>{formatCurrency(row.total)}</td>
-            <td>{new Date(row.createdAt).toLocaleString()}</td>
+            <td>{formatCurrency(row.totalAmount)}</td>
+            <td>{new Date(row.placedAt || row.createdAt).toLocaleString()}</td>
           </tr>
         ))}
       </tbody>

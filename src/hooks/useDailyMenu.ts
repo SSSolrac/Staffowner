@@ -3,6 +3,7 @@ import { dailyMenuService } from '@/services/dailyMenuService';
 import type { DailyMenu } from '@/types/dailyMenu';
 
 export const useDailyMenu = () => {
+  const [menuDate, setMenuDate] = useState<string>(() => new Date().toISOString().slice(0, 10));
   const [menu, setMenu] = useState<DailyMenu | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -12,14 +13,14 @@ export const useDailyMenu = () => {
     try {
       setLoading(true);
       setError('');
-      setMenu(await dailyMenuService.getCurrentDailyMenu());
+      setMenu(await dailyMenuService.getDailyMenu(menuDate));
     } catch (loadError) {
       console.error('Failed to load daily menu', loadError);
       setError('Unable to load daily menu.');
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [menuDate]);
 
   const saveDraft = useCallback(async (next: DailyMenu) => {
     setSaving(true);
@@ -36,7 +37,7 @@ export const useDailyMenu = () => {
     setSaving(true);
     try {
       await dailyMenuService.saveDailyMenu(next);
-      const saved = await dailyMenuService.publishDailyMenu();
+      const saved = await dailyMenuService.publishDailyMenu(next.menuDate);
       setMenu(saved);
       return saved;
     } finally {
@@ -47,28 +48,30 @@ export const useDailyMenu = () => {
   const unpublish = useCallback(async () => {
     setSaving(true);
     try {
-      const saved = await dailyMenuService.unpublishDailyMenu();
+      const menuDate = menu?.menuDate ?? new Date().toISOString().slice(0, 10);
+      const saved = await dailyMenuService.unpublishDailyMenu(menuDate);
       setMenu(saved);
       return saved;
     } finally {
       setSaving(false);
     }
-  }, []);
+  }, [menu?.menuDate]);
 
   const clearMenu = useCallback(async () => {
     setSaving(true);
     try {
-      const saved = await dailyMenuService.clearDailyMenu();
+      const menuDate = menu?.menuDate ?? new Date().toISOString().slice(0, 10);
+      const saved = await dailyMenuService.clearDailyMenu(menuDate);
       setMenu(saved);
       return saved;
     } finally {
       setSaving(false);
     }
-  }, []);
+  }, [menu?.menuDate]);
 
   useEffect(() => {
     load();
   }, [load]);
 
-  return { menu, loading, saving, error, saveDraft, publish, unpublish, clearMenu, refresh: load };
+  return { menuDate, setMenuDate, menu, loading, saving, error, saveDraft, publish, unpublish, clearMenu, refresh: load };
 };

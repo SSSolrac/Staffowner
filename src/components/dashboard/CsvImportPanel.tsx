@@ -52,7 +52,7 @@ export const CsvImportPanel = () => {
       {headers.length > 0 && <div className="overflow-auto border rounded"><table className="w-full text-sm min-w-[560px]"><thead><tr>{headers.map((header) => <th className="text-left p-2 border-b" key={header}>{header}</th>)}</tr></thead><tbody>{rows.slice(0, 12).map((row, index) => <tr key={index} className="border-b">{headers.map((header) => <td className="p-2" key={`${index}-${header}`}>{row[header]}</td>)}</tr>)}</tbody></table></div>}
 
       <button className="border rounded px-3 py-1" disabled={loading || validRows.length === 0} onClick={async () => {
-        const importResult = await csvImportService.importSales(validRows);
+        const importResult = await csvImportService.importSales(rows);
         setResult(importResult);
         toast.success(`Import complete: ${importResult.added} added, ${importResult.updated} updated.`);
       }}>{loading ? 'Processing...' : 'Confirm Import'}</button>

@@ -2,12 +2,13 @@ import type { LoyaltyAccount } from './loyalty';
 
 export interface CustomerProfile {
   id: string;
-  customerCode: string;
+  customerCode: string | null;
   name: string;
   email: string;
   phone: string;
-  addresses: string[];
+  addresses: unknown[];
   preferences: Record<string, unknown>;
+  isActive: boolean;
   createdAt: string;
   updatedAt: string;
 }

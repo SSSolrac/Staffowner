@@ -3,26 +3,21 @@ import { toast } from 'sonner';
 import { DateRangeFilter } from '@/components/dashboard';
 import { PaymentQrPreview, StatusChip } from '@/components/ui';
 import { useOrders } from '@/hooks/useOrders';
-import { loyaltyService } from '@/services/loyaltyService';
 import { paymentMethodToLabel } from '@/utils/payment';
 import { formatCurrency } from '@/utils/currency';
-import type { LoyaltyStampState, Order, OrderStatus } from '@/types/order';
+import type { Order, OrderStatus } from '@/types/order';
 
-const statuses: Array<OrderStatus | 'all'> = ['all', 'pending', 'preparing', 'ready', 'completed', 'cancelled', 'refunded', 'out_for_delivery', 'delivered'];
-
-const getLoyaltyState = (order: Order): LoyaltyStampState => {
-  if (order.loyaltyStampStatus === 'stamp-awarded') return 'granted';
-  if (order.loyaltyStampStatus === 'already-stamped' || loyaltyService.hasOrderAlreadyBeenStamped(order)) return 'already-stamped';
-  if (loyaltyService.canGrantStamp(order)) return 'eligible';
-  return 'not-eligible';
-};
-
-const loyaltyLabel: Record<LoyaltyStampState, string> = {
-  'not-eligible': 'Not eligible',
-  eligible: 'Loyalty eligible',
-  granted: 'Stamp awarded',
-  'already-stamped': 'Already stamped',
-};
+const statuses: Array<OrderStatus | 'all'> = [
+  'all',
+  'pending',
+  'preparing',
+  'ready',
+  'out_for_delivery',
+  'completed',
+  'delivered',
+  'cancelled',
+  'refunded',
+];
 
 const statusTone = (status: OrderStatus) => {
   if (status === 'completed' || status === 'delivered') return 'success';
@@ -31,11 +26,27 @@ const statusTone = (status: OrderStatus) => {
   return 'neutral';
 };
 
+const customerLabel = (order: Order) => {
+  const name = order.customer?.name?.trim();
+  const code = order.customer?.customerCode?.trim();
+  if (code && name) return `${code} · ${name}`;
+  if (name) return name;
+  if (code) return code;
+  return order.customerId ?? 'Guest';
+};
+
 export const OrdersPage = () => {
-  const { orders, loading, error, query, status, range, setQuery, setStatus, setRange, getOrderById, confirmPayment, updateStatus } = useOrders();
+  const { orders, loading, error, query, status, range, setQuery, setStatus, setRange, getOrderById, confirmPayment, updateStatus } =
+    useOrders();
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  
-  const statusSummary = useMemo(() => statuses.filter((item): item is OrderStatus => item !== 'all').map((item) => ({ status: item, total: orders.filter((order) => order.status === item).length })), [orders]);
+
+  const statusSummary = useMemo(
+    () =>
+      statuses
+        .filter((item): item is OrderStatus => item !== 'all')
+        .map((item) => ({ status: item, total: orders.filter((order) => order.status === item).length })),
+    [orders],
+  );
 
   if (loading) return <p>Loading orders...</p>;
   if (error) return <p className="text-red-600">{error}</p>;
@@ -46,69 +57,114 @@ export const OrdersPage = () => {
         <div className="flex flex-wrap items-end gap-3 justify-between">
           <div>
             <h2 className="text-lg font-semibold">Orders Operations</h2>
-            <p className="text-sm text-[#6B7280]">Track order progress, confirm payments, and auto-award loyalty stamps (10-stamp card: Free Latte at 6, Free Groom at 10).</p>
+            <p className="text-sm text-[#6B7280]">Track order progress, confirm payments, and update status in the shared backend.</p>
           </div>
           <DateRangeFilter value={range} onChange={setRange} />
         </div>
 
         <div className="grid md:grid-cols-3 gap-3">
-          <label className="text-sm">Search
-            <input className="block border rounded mt-1 px-2 py-1 w-full" placeholder="Order ID or customer" value={query} onChange={(e) => setQuery(e.target.value)} />
+          <label className="text-sm">
+            Search
+            <input
+              className="block border rounded mt-1 px-2 py-1 w-full"
+              placeholder="Order code"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
           </label>
-          <label className="text-sm">Status
+          <label className="text-sm">
+            Status
             <select className="block border rounded mt-1 px-2 py-1 w-full" value={status} onChange={(e) => setStatus(e.target.value as OrderStatus | 'all')}>
-              {statuses.map((value) => <option key={value} value={value}>{value === 'all' ? 'All statuses' : value}</option>)}
+              {statuses.map((value) => (
+                <option key={value} value={value}>
+                  {value === 'all' ? 'All statuses' : value}
+                </option>
+              ))}
             </select>
           </label>
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2 text-sm">
-          {statusSummary.map((item) => <div key={item.status} className="border rounded p-2 capitalize">{item.status}: <strong>{item.total}</strong></div>)}
+          {statusSummary.map((item) => (
+            <div key={item.status} className="border rounded p-2 capitalize">
+              {item.status.replaceAll('_', ' ')}: <strong>{item.total}</strong>
+            </div>
+          ))}
         </div>
       </section>
 
       <section className="rounded-lg border bg-white dark:bg-slate-800 p-4 overflow-auto">
-        <table className="w-full text-sm min-w-[1080px]">
-          <thead><tr className="text-left"><th>Order</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Payment</th><th>Loyalty</th><th>Actions</th></tr></thead>
+        <table className="w-full text-sm min-w-[1120px]">
+          <thead>
+            <tr className="text-left">
+              <th>Order</th>
+              <th>Customer</th>
+              <th>Type</th>
+              <th>Items</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Payment</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
           <tbody>
             {orders.map((order) => {
-              const paid = order.paymentStatus === 'paid';
-              const loyaltyState = getLoyaltyState(order);
+              const itemsCount = (order.items ?? []).reduce((sum, item) => sum + item.quantity, 0);
+              const paymentLabel = order.paymentMethod ? paymentMethodToLabel(order.paymentMethod) : '—';
+
               return (
-                <tr className="border-t" key={order.orderNumber}>
-                  <td className="font-medium">{order.orderNumber}</td>
-                  <td>{order.customerName}</td>
-                  <td>{order.items.reduce((sum, item) => sum + item.qty, 0)} items</td>
-                  <td>{formatCurrency(order.total)}</td>
+                <tr className="border-t" key={order.id}>
+                  <td className="font-medium">{order.code}</td>
+                  <td>{customerLabel(order)}</td>
+                  <td className="capitalize">{order.orderType.replaceAll('_', ' ')}</td>
+                  <td>{itemsCount} items</td>
+                  <td>{formatCurrency(order.totalAmount)}</td>
                   <td>
                     <div className="flex items-center gap-2">
                       <StatusChip label={order.status.replaceAll('_', ' ')} tone={statusTone(order.status)} />
-                      <select className="border rounded px-2 py-1" value={order.status} onChange={async (e) => { await updateStatus(order.id, e.target.value as OrderStatus); toast.success('Order status updated.'); }}>
-                        {statuses.filter((value) => value !== 'all').map((value) => <option key={value} value={value}>{value}</option>)}
+                      <select
+                        className="border rounded px-2 py-1"
+                        value={order.status}
+                        onChange={async (e) => {
+                          await updateStatus(order.id, e.target.value as OrderStatus);
+                          toast.success('Order status updated.');
+                        }}
+                      >
+                        {statuses
+                          .filter((value): value is OrderStatus => value !== 'all')
+                          .map((value) => (
+                            <option key={value} value={value}>
+                              {value}
+                            </option>
+                          ))}
                       </select>
                     </div>
                   </td>
-                  <td><StatusChip label={`${order.paymentStatus} · ${paymentMethodToLabel(order.paymentMethod)}`} tone={paid ? 'success' : 'warning'} /></td>
-                  <td>
-                    <div>
-                      <p>{loyaltyLabel[loyaltyState]}</p>
-                      {order.loyaltyUnlockedRewards?.length ? <p className="text-xs text-emerald-700">Reward unlocked: {order.loyaltyUnlockedRewards.join(', ')}</p> : null}
-                    </div>
+                  <td className="capitalize">
+                    {order.paymentStatus} · {paymentLabel}
                   </td>
-                  <td className="space-x-2">
-                    <button className="border rounded px-2 py-1" onClick={async () => { const detailed = await getOrderById(order.id); setSelectedOrder(detailed); }}>Details</button>
-                    <button
-                      className="border rounded px-2 py-1 disabled:opacity-50"
-                      disabled={paid && loyaltyState === 'already-stamped'}
-                      onClick={async () => {
-                        const updated = await confirmPayment(order.id);
-                        if (updated.loyaltyStampStatus === 'stamp-awarded') toast.success('Payment confirmed. 1 stamp auto-awarded.');
-                        else if (updated.loyaltyStampStatus === 'already-stamped') toast.info('Payment confirmed. Loyalty was already applied for this order.');
-                        else toast.success('Payment confirmed.');
-                      }}
-                    >
-                      {paid ? 'Recheck Payment' : 'Confirm Payment'}
-                    </button>
+                  <td>
+                    <div className="flex flex-wrap gap-2 items-center">
+                      <button
+                        className="border rounded px-2 py-1"
+                        onClick={async () => {
+                          const full = await getOrderById(order.id);
+                          setSelectedOrder(full);
+                        }}
+                      >
+                        Details
+                      </button>
+                      <button
+                        className="border rounded px-2 py-1 disabled:opacity-50"
+                        disabled={order.paymentStatus === 'paid'}
+                        onClick={async () => {
+                          const updated = await confirmPayment(order.id);
+                          toast.success(updated.paymentStatus === 'paid' ? 'Payment confirmed.' : 'Payment updated.');
+                        }}
+                      >
+                        {order.paymentStatus === 'paid' ? 'Paid' : 'Confirm Payment'}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               );
@@ -121,28 +177,47 @@ export const OrdersPage = () => {
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-20">
           <div className="w-full max-w-4xl rounded-lg border bg-white dark:bg-slate-800 p-4 space-y-3 max-h-[90vh] overflow-auto">
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold">Order details: {selectedOrder.id}</h3>
-              <button className="border rounded px-2 py-1" onClick={() => setSelectedOrder(null)}>Close</button>
+              <h3 className="font-semibold">Order details: {selectedOrder.code}</h3>
+              <button className="border rounded px-2 py-1" onClick={() => setSelectedOrder(null)}>
+                Close
+              </button>
             </div>
+
             <div className="grid md:grid-cols-2 gap-3 text-sm">
               <div className="border rounded p-3 space-y-1">
-                <p><strong>Customer:</strong> {selectedOrder.customerName}</p>
-                <p><strong>Email:</strong> {selectedOrder.customerEmail ?? 'Not provided'}</p>
-                <p><strong>Phone:</strong> {selectedOrder.customerPhone ?? 'Not provided'}</p>
-                <p><strong>Created:</strong> {new Date(selectedOrder.createdAt).toLocaleString()}</p>
-                <p className="capitalize"><strong>Payment:</strong> {selectedOrder.paymentStatus} via {paymentMethodToLabel(selectedOrder.paymentMethod)}</p>
-                <p><strong>Loyalty:</strong> {loyaltyLabel[getLoyaltyState(selectedOrder)]}</p>
-                <p><strong>Loyalty Source:</strong> {selectedOrder.loyaltyStampedBy === 'automatic-order-confirmation' ? 'Automatic from order confirmation' : 'Not yet stamped'}</p>
-                <p><strong>Loyalty Note:</strong> {selectedOrder.loyaltyMessage ?? 'No loyalty activity yet.'}</p>
-                {selectedOrder.loyaltyUnlockedRewards?.length ? <p><strong>Reward unlocked:</strong> {selectedOrder.loyaltyUnlockedRewards.join(', ')}</p> : null}
+                <p>
+                  <strong>Customer:</strong> {customerLabel(selectedOrder)}
+                </p>
+                <p>
+                  <strong>Email:</strong> {selectedOrder.customer?.email || 'Not provided'}
+                </p>
+                <p>
+                  <strong>Phone:</strong> {selectedOrder.customer?.phone || 'Not provided'}
+                </p>
+                <p>
+                  <strong>Placed:</strong> {new Date(selectedOrder.placedAt).toLocaleString()}
+                </p>
+                <p className="capitalize">
+                  <strong>Payment:</strong> {selectedOrder.paymentStatus} via{' '}
+                  {selectedOrder.paymentMethod ? paymentMethodToLabel(selectedOrder.paymentMethod) : '—'}
+                </p>
+                {selectedOrder.orderType === 'delivery' && (
+                  <p>
+                    <strong>Delivery address:</strong> {selectedOrder.deliveryAddress ? JSON.stringify(selectedOrder.deliveryAddress) : 'Not provided'}
+                  </p>
+                )}
               </div>
 
               <div className="border rounded p-3 space-y-2 text-sm">
                 <p className="font-medium">Amount Breakdown</p>
-                {selectedOrder.items.map((item) => <p key={item.itemName}>{item.qty} × {item.itemName} · {formatCurrency(item.qty * item.unitPrice)}</p>)}
-                <p>Service fee: {formatCurrency(selectedOrder.serviceFee ?? 0)}</p>
-                <p>Discount: -{formatCurrency(selectedOrder.discount ?? 0)}</p>
-                <p className="font-semibold">Grand total: {formatCurrency(selectedOrder.total)}</p>
+                {(selectedOrder.items ?? []).map((item) => (
+                  <p key={item.id}>
+                    {item.quantity} × {item.itemName} · {formatCurrency(item.lineTotal || item.quantity * item.unitPrice)}
+                  </p>
+                ))}
+                <p>Subtotal: {formatCurrency(selectedOrder.subtotal)}</p>
+                <p>Discount: -{formatCurrency(selectedOrder.discountTotal)}</p>
+                <p className="font-semibold">Grand total: {formatCurrency(selectedOrder.totalAmount)}</p>
               </div>
             </div>
 
@@ -150,15 +225,19 @@ export const OrdersPage = () => {
               <PaymentQrPreview paymentMethod={selectedOrder.paymentMethod} />
               <div>
                 <p className="font-medium text-sm mb-2">Payment proof preview</p>
-                {selectedOrder.receiptImageUrl ? <img src={selectedOrder.receiptImageUrl} alt="Payment proof" className="h-36 rounded border object-cover" /> : <p className="text-sm text-[#6B7280]">No proof attached yet.</p>}
+                {selectedOrder.receiptImageUrl ? (
+                  <img src={selectedOrder.receiptImageUrl} alt="Payment proof" className="h-36 rounded border object-cover" />
+                ) : (
+                  <p className="text-sm text-[#6B7280]">No proof attached yet.</p>
+                )}
               </div>
             </div>
 
             <div className="border rounded p-3">
               <p className="font-medium text-sm mb-2">Status timeline</p>
               <div className="space-y-2 text-sm">
-                {(selectedOrder.statusTimeline ?? []).map((event, index) => (
-                  <div key={`${event.changedAt}-${event.status}-${index}`} className="border-l-2 pl-3">
+                {(selectedOrder.statusTimeline ?? []).map((event) => (
+                  <div key={event.id} className="border-l-2 pl-3">
                     <p className="capitalize font-medium">{event.status.replaceAll('_', ' ')}</p>
                     <p className="text-[#6B7280]">{new Date(event.changedAt).toLocaleString()}</p>
                     {event.note && <p className="text-[#6B7280]">{event.note}</p>}
@@ -170,22 +249,19 @@ export const OrdersPage = () => {
             <div>
               <p className="font-medium text-sm mb-1">Internal order notes</p>
               <textarea className="border rounded w-full px-2 py-1 text-sm" rows={4} value={selectedOrder.notes ?? ''} readOnly />
-              <p className="text-xs text-[#6B7280] mt-1">Notes are read-only because the backend does not provide an order-notes update endpoint.</p>
             </div>
 
             <div className="flex gap-2">
               <button
                 className="border rounded px-3 py-1 disabled:opacity-50"
-                disabled={selectedOrder.paymentStatus === 'paid' && getLoyaltyState(selectedOrder) === 'already-stamped'}
+                disabled={selectedOrder.paymentStatus === 'paid'}
                 onClick={async () => {
                   const updated = await confirmPayment(selectedOrder.id);
                   setSelectedOrder(updated);
-                  if (updated.loyaltyStampStatus === 'stamp-awarded') toast.success('Payment confirmed. Stamp auto-awarded.');
-                  else if (updated.loyaltyStampStatus === 'already-stamped') toast.info('Payment already confirmed and stamp already applied.');
-                  else toast.success('Payment confirmed.');
+                  toast.success('Payment confirmed.');
                 }}
               >
-                {selectedOrder.paymentStatus === 'paid' ? 'Recheck Payment' : 'Confirm Payment'}
+                {selectedOrder.paymentStatus === 'paid' ? 'Paid' : 'Confirm Payment'}
               </button>
             </div>
           </div>
@@ -194,3 +270,4 @@ export const OrdersPage = () => {
     </div>
   );
 };
+

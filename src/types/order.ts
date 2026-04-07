@@ -1,7 +1,8 @@
 import type { DateRangePreset } from './dashboard';
+import type { CustomerProfile } from './customer';
 
 export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded';
-export type PaymentMethod = 'qrph' | 'gcash' | 'maribank' | 'bdo';
+export type PaymentMethod = 'qrph' | 'gcash' | 'maribank' | 'bdo' | 'cash' | null;
 
 export type OrderType = 'dine_in' | 'pickup' | 'takeout' | 'delivery';
 
@@ -18,52 +19,46 @@ export type OrderStatus =
 export type OrderItem = {
   id: string;
   orderId: string;
-  menuItemId?: string;
+  menuItemId: string | null;
+  menuItemCode: string | null;
   itemName: string;
-  qty: number;
   unitPrice: number;
+  discountAmount: number;
+  quantity: number;
   lineTotal: number;
+  createdAt: string;
 };
 
 export type OrderStatusHistoryItem = {
   id: string;
   orderId: string;
   status: OrderStatus;
-  note?: string;
-  changedByUserId?: string;
+  changedBy: string | null;
+  note: string | null;
   changedAt: string;
 };
 
-export type OrderLoyaltyStatus = 'not-eligible' | 'eligible' | 'stamp-awarded' | 'already-stamped';
-
 export type Order = {
   id: string;
-  orderNumber: string;
-  customerId?: string;
-  customerName: string;
-  customerEmail?: string;
-  customerPhone?: string;
-  customerAddress?: string;
+  code: string;
+  customerId: string | null;
   orderType: OrderType;
-  items: OrderItem[];
-  subtotal: number;
-  serviceFee: number;
-  discount: number;
-  total: number;
   status: OrderStatus;
-  statusTimeline?: OrderStatusHistoryItem[];
-  paymentStatus: PaymentStatus;
   paymentMethod: PaymentMethod;
-  receiptImageUrl?: string;
+  paymentStatus: PaymentStatus;
+  subtotal: number;
+  discountTotal: number;
+  totalAmount: number;
+  receiptImageUrl: string | null;
+  notes: string | null;
+  deliveryAddress: unknown;
+  placedAt: string;
   createdAt: string;
   updatedAt: string;
-  notes?: string;
-  loyaltyStampPreparedAt?: string;
-  loyaltyStampStatus?: OrderLoyaltyStatus;
-  loyaltyStampedAt?: string;
-  loyaltyStampedBy?: 'automatic-order-confirmation' | 'manual-staff-adjustment';
-  loyaltyMessage?: string;
-  loyaltyUnlockedRewards?: string[];
+
+  items?: OrderItem[];
+  statusTimeline?: OrderStatusHistoryItem[];
+  customer?: Pick<CustomerProfile, 'id' | 'customerCode' | 'name' | 'email' | 'phone'> | null;
 };
 
 export type OrderFilters = {
@@ -71,5 +66,3 @@ export type OrderFilters = {
   status?: OrderStatus | 'all';
   range?: DateRangePreset;
 };
-
-export type LoyaltyStampState = 'not-eligible' | 'eligible' | 'granted' | 'already-stamped';

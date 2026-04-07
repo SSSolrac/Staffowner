@@ -24,10 +24,11 @@ export const useOrders = () => {
         rows.forEach((order) => {
           if (!next[order.id]) {
             if (Date.now() - new Date(order.createdAt).getTime() <= 5 * 60 * 1000) {
+              const customerLabel = order.customer?.name || order.customer?.customerCode || order.customerId || 'Unknown customer';
               notificationService.create({
                 type: 'new_order',
                 title: 'New order received',
-                message: `${order.orderNumber} placed by ${order.customerName}.`,
+                message: `${order.code} placed by ${customerLabel}.`,
                 relatedOrderId: order.id,
               });
             }
@@ -35,7 +36,7 @@ export const useOrders = () => {
             notificationService.create({
               type: 'order_cancelled',
               title: 'Order cancelled',
-              message: `${order.orderNumber} was cancelled.`,
+              message: `${order.code} was cancelled.`,
               relatedOrderId: order.id,
             });
           }
@@ -45,7 +46,8 @@ export const useOrders = () => {
       });
     } catch (loadError) {
       console.error('Failed to load orders', loadError);
-      setError('Unable to load orders.');
+      const message = loadError instanceof Error && loadError.message.trim() ? loadError.message : 'Unable to load orders.';
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -69,7 +71,7 @@ export const useOrders = () => {
       notificationService.create({
         type: 'order_cancelled',
         title: 'Order cancelled',
-        message: `${updated.orderNumber} was cancelled.`,
+        message: `${updated.code} was cancelled.`,
         relatedOrderId: updated.id,
       });
     }

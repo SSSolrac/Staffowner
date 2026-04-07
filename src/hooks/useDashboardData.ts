@@ -3,7 +3,7 @@ import { dashboardService } from '@/services/dashboardService';
 import type { DashboardData, DateRangePreset } from '@/types/dashboard';
 
 export const useDashboardData = () => {
-  const [selectedRange, setSelectedRange] = useState<DateRangePreset>('today');
+  const [selectedRange, setSelectedRange] = useState<DateRangePreset>('30d');
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');

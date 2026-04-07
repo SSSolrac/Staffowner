@@ -1,6 +1,6 @@
 # Staffowner Dashboard
 
-A production-ready React + TypeScript dashboard built with Vite and TailwindCSS. The project now uses a scalable feature-oriented architecture, includes authentication, protected routes, owner-only admin pages, login history tracking, toast feedback, dark mode toggle, and a customer loyalty tier system.
+A React + TypeScript dashboard built with Vite and TailwindCSS. This app connects directly to the shared Supabase backend (Auth + Postgres public schema) used by both Staffowner and Customer.
 
 ## Tech Stack
 
@@ -54,11 +54,17 @@ src/
 
 - `owner@happytails.com` (role: owner)
 - `staff@happytails.com` (role: staff)
-- Any non-empty password for demo mode
+- Use the password configured in Supabase Auth
 
-## API Configuration
+## Supabase Configuration
 
-This UI expects a backend that serves endpoints under `/api/*` (dashboard, orders, menu, customers, etc.).
+Set these env vars (see `.env`):
 
-- **Local dev without a backend:** the app uses a built-in mock API by default when running `npm run dev` (or set `VITE_USE_MOCK_API=true`).
-- **Connect a real backend:** set `VITE_API_BASE_URL` (e.g. in `.env.local`) to your API origin (example: `VITE_API_BASE_URL=http://localhost:3000`).
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY` (or `VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY`)
+
+## Troubleshooting
+
+### Orders page: "stack depth limit exceeded"
+
+If loading `/orders` fails and you see a Supabase/Postgres error like `54001: stack depth limit exceeded`, the issue is in the Supabase database (not the React app). This typically happens when Row Level Security (RLS) policies on `orders` and `order_items` reference each other (creating a recursion loop). Rewrite the RLS policies to remove circular references, then reload the app.

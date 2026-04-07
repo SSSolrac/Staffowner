@@ -9,7 +9,7 @@ export const TopItemsChart = ({ title, data }: { title: string; data: Array<{ la
           <XAxis type="number" />
           <YAxis type="category" dataKey="label" width={130} />
           <Tooltip />
-          <Bar dataKey="value" fill="#0ea5e9" radius={4} />
+          <Bar dataKey="value" fill="#FF8FA3" radius={4} />
         </BarChart>
       </ResponsiveContainer>
     </div>

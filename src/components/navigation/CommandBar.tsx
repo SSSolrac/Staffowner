@@ -23,11 +23,16 @@ export const CommandBar = () => {
 
   return (
     <div className="relative">
-      <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Quick search" className="rounded-xl border border-[#F3D6DB] bg-white px-3 py-1.5 text-sm w-56" />
+      <input
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Quick search"
+        className="rounded-lg border border-white/30 bg-white/20 px-3 py-1.5 text-sm w-56 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/40"
+      />
       {query && (
-        <div className="absolute z-10 mt-1 w-full rounded-xl border border-[#F3D6DB] bg-white p-1 shadow-sm">
+        <div className="absolute z-10 mt-1 w-full rounded-lg border border-[#F3D6DB] bg-white p-1 shadow-lg">
           {filtered.map((item) => (
-            <Link key={item.path} to={item.path} className="block rounded-lg px-2 py-1 text-sm text-[#1F2937] hover:bg-[#FFE4E8]">
+            <Link key={item.path} to={item.path} className="block rounded-md px-2 py-1 text-sm text-[#1F2937] hover:bg-[#FFF3F5]">
               {item.label}
             </Link>
           ))}

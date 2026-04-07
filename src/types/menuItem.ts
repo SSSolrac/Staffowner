@@ -1,14 +1,11 @@
-export type InventoryStatus = 'in_stock' | 'low_stock' | 'out_of_stock';
-
 export type MenuItem = {
   id: string;
   code: string;
   categoryId: string;
   name: string;
-  description: string;
+  description: string | null;
   price: number;
   isAvailable: boolean;
-  manualAvailabilityOverride?: boolean;
   imageUrl: string | null;
   discount: number;
   createdAt: string;
@@ -18,8 +15,6 @@ export type MenuItem = {
 export type MenuCategory = {
   id: string;
   name: string;
-  description?: string | null;
+  sortOrder: number;
   isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
 };

@@ -22,7 +22,8 @@ export const CustomersLoyaltyPage = () => {
   const [selected, setSelected] = useState<Customer | null>(null);
 
   const filtered = useMemo(() => customers.filter((customer) => {
-    const byQuery = customer.name.toLowerCase().includes(query.toLowerCase()) || customer.email.toLowerCase().includes(query.toLowerCase()) || customer.customerCode.toLowerCase().includes(query.toLowerCase());
+    const customerCode = customer.customerCode ?? '';
+    const byQuery = customer.name.toLowerCase().includes(query.toLowerCase()) || customer.email.toLowerCase().includes(query.toLowerCase()) || customerCode.toLowerCase().includes(query.toLowerCase());
     const byReward = rewardFilter === 'All' || rewardReadiness(customer) === rewardFilter;
     return byQuery && byReward;
   }), [customers, query, rewardFilter]);
@@ -59,13 +60,13 @@ export const CustomersLoyaltyPage = () => {
       <section className="grid lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 rounded-lg border bg-white dark:bg-slate-800 p-4 overflow-auto">
           <table className="w-full text-sm min-w-[880px]"><thead><tr className="text-left"><th>Code</th><th>Name</th><th>Email</th><th>Stamps</th><th>Available Rewards</th><th>Redeemed</th><th>Status</th><th>Action</th></tr></thead><tbody>
-            {filtered.map((customer) => <tr key={customer.id} className="border-t"><td>{customer.customerCode}</td><td>{customer.name}</td><td>{customer.email}</td><td>{customer.loyalty.stampCount}/{LOYALTY_TOTAL_STAMPS}</td><td>{rewardLabels(customer.loyalty.availableRewards) || 'None'}</td><td>{rewardLabels(customer.loyalty.redeemedRewards) || 'None'}</td><td>{rewardReadiness(customer)}</td><td><button className="border rounded px-2 py-1" onClick={() => setSelected(customer)}>Details</button></td></tr>)}
+            {filtered.map((customer) => <tr key={customer.id} className="border-t"><td>{customer.customerCode ?? '-'}</td><td>{customer.name}</td><td>{customer.email}</td><td>{customer.loyalty.stampCount}/{LOYALTY_TOTAL_STAMPS}</td><td>{rewardLabels(customer.loyalty.availableRewards) || 'None'}</td><td>{rewardLabels(customer.loyalty.redeemedRewards) || 'None'}</td><td>{rewardReadiness(customer)}</td><td><button className="border rounded px-2 py-1" onClick={() => setSelected(customer)}>Details</button></td></tr>)}
           </tbody></table>
         </div>
         <aside className="rounded-lg border bg-white dark:bg-slate-800 p-4 space-y-3"><h3 className="font-medium">Customer activity snapshot</h3></aside>
       </section>
 
-      {selected && <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-20"><div className="w-full max-w-xl rounded-lg border bg-white dark:bg-slate-800 p-4 space-y-3"><div className="flex items-center justify-between"><h3 className="font-semibold">{selected.name}</h3><button className="border rounded px-2 py-1" onClick={() => setSelected(null)}>Close</button></div><p>Customer code: {selected.customerCode}</p><p>Stamp count: {selected.loyalty.stampCount}</p><p>Available rewards: {rewardLabels(selected.loyalty.availableRewards) || 'None'}</p></div></div>}
+      {selected && <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-20"><div className="w-full max-w-xl rounded-lg border bg-white dark:bg-slate-800 p-4 space-y-3"><div className="flex items-center justify-between"><h3 className="font-semibold">{selected.name}</h3><button className="border rounded px-2 py-1" onClick={() => setSelected(null)}>Close</button></div><p>Customer code: {selected.customerCode ?? '-'}</p><p>Stamp count: {selected.loyalty.stampCount}</p><p>Available rewards: {rewardLabels(selected.loyalty.availableRewards) || 'None'}</p></div></div>}
     </div>
   );
 };

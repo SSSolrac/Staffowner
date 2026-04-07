@@ -1,30 +1,24 @@
-import { authApi } from '@/api/auth';
 import type { LoginHistoryEntry, LoginHistoryFilters } from '@/types/loginHistory';
 import type { SessionUser } from '@/types/user';
 
 export const loginHistoryService = {
-  async recordLogin(entry: Omit<LoginHistoryEntry, 'id'>) {
-    return authApi.recordLoginHistory(entry);
+  async recordLogin(_entry: Omit<LoginHistoryEntry, 'id'>) {
+    // Login history is not part of the canonical shared backend contract.
+    // Keep this as a no-op to avoid introducing a second backend model.
+    return undefined;
   },
 
   async recordLogout(user: Pick<SessionUser, 'id' | 'name' | 'role'>) {
-    await authApi.recordLoginHistory({
-      userId: user.id,
-      userName: user.name,
-      role: user.role,
-      loginTime: new Date().toISOString(),
-      logoutTime: new Date().toISOString(),
-      ipAddress: '0.0.0.0',
-      device: 'unknown',
-      loginStatus: 'success',
-    });
+    void user;
+    return undefined;
   },
 
   async getLoginHistory(filters: LoginHistoryFilters) {
-    return authApi.listLoginHistory(filters);
+    void filters;
+    return { rows: [], total: 0 };
   },
 
   async getLoginStats() {
-    return authApi.loginHistoryStats();
+    return { totalToday: 0, failed: 0, staff: 0, customer: 0 };
   },
 };
